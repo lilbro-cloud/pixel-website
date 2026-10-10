@@ -4,501 +4,513 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pixel Market 3.0</title>
+<title>Pixel Market</title>
 <style>
+:root {
+  color-scheme: dark;
+  --bg: #10131c;
+  --panel: #1a2030;
+  --border: #303a50;
+  --accent: #58a6ff;
+  --text: #f0f4ff;
+  --muted: #aebbd0;
+}
 * { box-sizing: border-box; }
-
 body {
   margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, Arial, sans-serif;
+}
+header {
+  text-align: center;
+  padding: 24px 16px 12px;
+}
+header h1 { margin: 0 0 8px; }
+header p { color: var(--muted); margin: 0; }
+main {
+  max-width: 1100px;
+  margin: auto;
   padding: 16px;
-  font-family: Arial, sans-serif;
-  color: #172033;
-  background: #edf1f7;
 }
-
-h1 { margin: 0 0 8px; }
-h2 { font-size: 19px; }
-p { line-height: 1.5; }
-
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
 .panel {
-  background: white;
-  padding: 15px;
-  margin: 14px 0;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px #0000000a;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  min-width: 0;
 }
-
-#world {
+canvas {
   display: block;
   width: 100%;
   height: auto;
-  border: 2px solid #263247;
-  border-radius: 4px;
-  background: white;
+  aspect-ratio: 1 / 1;
+  background: #fff;
+  border-radius: 8px;
   touch-action: none;
+  cursor: crosshair;
 }
-
+.hint {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
 label {
   display: block;
-  margin: 12px 0 6px;
-  font-weight: bold;
+  font-weight: 650;
+  margin: 14px 0 6px;
 }
-
-input {
-  display: block;
+input[type="text"], input[type="url"], input[type="file"] {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #bbc5d4;
+  padding: 11px;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  font-size: 16px;
-  background: white;
+  background: #101522;
+  color: var(--text);
 }
-
 button {
-  padding: 12px 15px;
-  margin: 8px 5px 0 0;
+  width: 100%;
   border: 0;
-  border-radius: 8px;
-  background: #1769e0;
-  color: white;
+  border-radius: 9px;
+  padding: 12px;
+  margin-top: 12px;
+  background: var(--accent);
+  color: #071426;
+  font-weight: 750;
   font-size: 15px;
-  font-weight: bold;
+  cursor: pointer;
 }
-
-button.secondary { background: #4b5563; }
-
-#price {
-  color: #087b43;
-  font-size: 25px;
-  font-weight: bold;
+button.secondary {
+  background: #303b50;
+  color: var(--text);
 }
-
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+.stat {
+  background: #111725;
+  border-radius: 9px;
+  padding: 12px;
+}
+.stat small { color: var(--muted); display: block; }
+.stat strong { display: block; margin-top: 5px; overflow-wrap: anywhere; }
 #message {
-  overflow-wrap: anywhere;
   font-size: 14px;
+  line-height: 1.5;
+  margin-top: 12px;
+  overflow-wrap: anywhere;
 }
-
-.small {
-  color: #667085;
-  font-size: 13px;
+.preview {
+  margin-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 10px;
 }
-
-#preview {
+.preview img {
   display: block;
   max-width: 100%;
-  max-height: 180px;
-  margin-top: 10px;
-  border-radius: 8px;
+  max-height: 220px;
+  margin: 8px auto 0;
+  object-fit: contain;
 }
-
-#preview[hidden] { display: none; }
-
-a { overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  .layout { grid-template-columns: 1fr; }
+  main { padding: 10px; }
+  .panel { padding: 12px; }
+}
 </style>
 </head>
-
 <body>
+<header>
+  <h1>🟦 Pixel Market</h1>
+  <p>Pilih area pixel, pasang gambar, dan buat pratinjau iklan.</p>
+</header>
 
-<h1>Pixel Market</h1>
-<p>Tempat untuk memasang iklan berbasis piksel.</p>
+<main>
+  <div class="layout">
+    <section class="panel">
+      <h2>Grid Iklan</h2>
+      <canvas id="world" width="1000" height="1000"
+        aria-label="Grid untuk memilih area iklan"></canvas>
+      <p class="hint">
+        Sentuh atau klik, lalu geser pada grid untuk memilih area.
+        Lepaskan jari atau tombol mouse untuk menyelesaikan pilihan.
+      </p>
+      <div class="stats">
+        <div class="stat">
+          <small>Ukuran area</small>
+          <strong id="dimensions">Belum dipilih</strong>
+        </div>
+        <div class="stat">
+          <small>Jumlah kotak</small>
+          <strong id="cells">0</strong>
+        </div>
+        <div class="stat">
+          <small>Harga per kotak</small>
+          <strong>Rp100</strong>
+        </div>
+        <div class="stat">
+          <small>Total harga</small>
+          <strong id="price">Rp0</strong>
+        </div>
+      </div>
+    </section>
 
-<div class="panel">
-  <strong>Ukuran kanvas:</strong> 10.000 × 10.000 unit<br>
-  <strong>Ukuran satu kotak:</strong> 100 × 100 unit<br>
-  <strong>Harga:</strong> Rp100 per kotak
-</div>
+    <section class="panel">
+      <h2>Buat Iklan</h2>
+      <p class="hint">
+        Pilih area pada grid, unggah gambar, lalu masukkan alamat situs.
+        Ini masih pratinjau lokal, bukan iklan yang sudah dibayar.
+      </p>
 
-<div class="panel">
-  <h2>1. Pilih area iklan</h2>
-  <p class="small">
-    Tarik jari pada grid untuk memilih persegi panjang.
-    Jika area sudah dipasangi iklan, ketuk gambarnya untuk
-    membuka tautan.
-  </p>
-  <canvas id="world" width="1000" height="1000"></canvas>
+      <label for="imageFile">Gambar iklan (maksimal 5 MB)</label>
+      <input id="imageFile" type="file" accept="image/*">
 
-  <p id="status">Belum ada area yang dipilih.</p>
-  <p id="price">Harga: Rp0</p>
+      <div class="preview" id="previewBox" hidden>
+        <strong>Pratinjau gambar asli</strong>
+        <img id="previewImage" alt="Pratinjau gambar yang dipilih">
+      </div>
 
-  <button id="cancel" class="secondary">Batal pilihan</button>
-</div>
+      <label for="adUrl">Alamat situs tujuan</label>
+      <input id="adUrl" type="url"
+        placeholder="https://contoh.com"
+        autocomplete="url">
 
-<div class="panel">
-  <h2>2. Buat iklan</h2>
+      <button id="publishButton">Tampilkan Pratinjau Iklan</button>
+      <button id="clearButton" class="secondary">Hapus Pratinjau Iklan</button>
 
-  <label for="imageFile">Gambar iklan dari galeri</label>
-  <input id="imageFile" type="file" accept="image/*">
+      <div id="message" role="status" aria-live="polite">
+        Pilih area pada grid untuk memulai.
+      </div>
 
-  <img id="preview" alt="Pratinjau gambar iklan" hidden>
-
-  <label for="website">Tautan website pengiklan</label>
-  <input
-    id="website"
-    type="url"
-    placeholder="https://contoh.com"
-    autocomplete="url"
-  >
-
-  <button id="publish">Tampilkan pratinjau iklan</button>
-
-  <p id="message" aria-live="polite">
-    Pilih area, gambar, dan tautan terlebih dahulu.
-  </p>
-
-  <p class="small">
-    Ini hanya pratinjau di perangkatmu. Belum ada pembayaran
-    atau penyimpanan iklan permanen.
-  </p>
-</div>
+      <p class="hint">
+        v3.1: gambar mengikuti bentuk area pilihan. Jika area melebar,
+        gambar ikut melebar; jika area tegak, gambar ikut tegak.
+        Bentuk gambar asli dapat berubah karena menyesuaikan area.
+      </p>
+      <p class="hint">
+        Catatan: iklan dan gambar belum tersimpan permanen atau dibagikan
+        kepada pengunjung lain. Jangan gunakan untuk transaksi sungguhan.
+      </p>
+    </section>
+  </div>
+</main>
 
 <script>
-"use strict";
+(() => {
+  "use strict";
 
-const canvas = document.getElementById("world");
-const ctx = canvas.getContext("2d");
-const statusText = document.getElementById("status");
-const priceText = document.getElementById("price");
-const message = document.getElementById("message");
-const imageFile = document.getElementById("imageFile");
-const websiteInput = document.getElementById("website");
-const preview = document.getElementById("preview");
+  const canvas = document.getElementById("world");
+  const ctx = canvas.getContext("2d");
+  const imageFile = document.getElementById("imageFile");
+  const adUrl = document.getElementById("adUrl");
+  const publishButton = document.getElementById("publishButton");
+  const clearButton = document.getElementById("clearButton");
+  const dimensions = document.getElementById("dimensions");
+  const cellsLabel = document.getElementById("cells");
+  const priceLabel = document.getElementById("price");
+  const message = document.getElementById("message");
+  const previewBox = document.getElementById("previewBox");
+  const previewImage = document.getElementById("previewImage");
 
-const GRID = 10;
-const UNIT_PER_PIXEL = 10;
-const PRICE_PER_CELL = 100;
+  const GRID = 10;
+  const CELL_PRICE = 100;
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-let start = null;
-let current = null;
-let dragging = false;
-let selection = null;
-let ad = null;
-let loadedImage = null;
-let imageUrl = null;
+  let selection = null;
+  let dragStart = null;
+  let dragging = false;
+  let uploadedImage = null;
+  let uploadedObjectUrl = null;
+  let ad = null;
 
-function snap(value) {
-  return Math.max(
-    0,
-    Math.min(
-      canvas.width,
-      Math.round(value / GRID) * GRID
-    )
-  );
-}
-
-function getPosition(event) {
-  const rect = canvas.getBoundingClientRect();
-
-  return {
-    x: snap((event.clientX - rect.left) *
-      canvas.width / rect.width),
-    y: snap((event.clientY - rect.top) *
-      canvas.height / rect.height)
-  };
-}
-
-function makeArea(a, b) {
-  return {
-    x: Math.min(a.x, b.x),
-    y: Math.min(a.y, b.y),
-    width: Math.abs(b.x - a.x),
-    height: Math.abs(b.y - a.y)
-  };
-}
-
-function getActiveArea() {
-  if (dragging && start && current) {
-    return makeArea(start, current);
+  function money(value) {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0
+    }).format(value);
   }
-  return selection;
-}
 
-function drawImageCover(img, x, y, width, height) {
-  const scale = Math.max(
-    width / img.width,
-    height / img.height
-  );
+  function pointerPosition(event) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: Math.max(0, Math.min(canvas.width,
+        (event.clientX - rect.left) * canvas.width / rect.width)),
+      y: Math.max(0, Math.min(canvas.height,
+        (event.clientY - rect.top) * canvas.height / rect.height))
+    };
+  }
 
-  const sourceWidth = width / scale;
-  const sourceHeight = height / scale;
-  const sourceX = (img.width - sourceWidth) / 2;
-  const sourceY = (img.height - sourceHeight) / 2;
+  function cellPosition(point) {
+    return {
+      x: Math.max(0, Math.min(99, Math.floor(point.x / GRID))),
+      y: Math.max(0, Math.min(99, Math.floor(point.y / GRID)))
+    };
+  }
 
-  ctx.drawImage(
-    img,
-    sourceX, sourceY, sourceWidth, sourceHeight,
-    x, y, width, height
-  );
-}
+  function rectangleFrom(a, b) {
+    const left = Math.min(a.x, b.x);
+    const top = Math.min(a.y, b.y);
+    const right = Math.max(a.x, b.x) + 1;
+    const bottom = Math.max(a.y, b.y) + 1;
 
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+    return {
+      x: left,
+      y: top,
+      w: right - left,
+      h: bottom - top
+    };
+  }
 
-  for (let x = 0; x <= canvas.width; x += GRID) {
-    ctx.beginPath();
-    ctx.strokeStyle =
-      (x / GRID) % 5 === 0 ? "#999999" : "#dedede";
+  function selectionCells() {
+    return selection ? selection.w * selection.h : 0;
+  }
+
+  function updateStats() {
+    if (!selection) {
+      dimensions.textContent = "Belum dipilih";
+      cellsLabel.textContent = "0";
+      priceLabel.textContent = money(0);
+      return;
+    }
+
+    dimensions.textContent =
+      selection.w + " × " + selection.h + " kotak";
+    cellsLabel.textContent = selectionCells().toLocaleString("id-ID");
+    priceLabel.textContent = money(selectionCells() * CELL_PRICE);
+  }
+
+  function drawGrid() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.strokeStyle = "#d8dee8";
     ctx.lineWidth = 1;
-    ctx.moveTo(x + 0.5, 0);
-    ctx.lineTo(x + 0.5, canvas.height);
-    ctx.stroke();
+
+    for (let p = 0; p <= canvas.width; p += GRID) {
+      ctx.beginPath();
+      ctx.moveTo(p + 0.5, 0);
+      ctx.lineTo(p + 0.5, canvas.height);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0, p + 0.5);
+      ctx.lineTo(canvas.width, p + 0.5);
+      ctx.stroke();
+    }
   }
 
-  for (let y = 0; y <= canvas.height; y += GRID) {
-    ctx.beginPath();
-    ctx.strokeStyle =
-      (y / GRID) % 5 === 0 ? "#999999" : "#dedede";
-    ctx.lineWidth = 1;
-    ctx.moveTo(0, y + 0.5);
-    ctx.lineTo(canvas.width, y + 0.5);
-    ctx.stroke();
+  function draw() {
+    drawGrid();
+
+    if (ad) {
+      const r = ad.rect;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(r.x * GRID, r.y * GRID,
+        r.w * GRID, r.h * GRID);
+      ctx.clip();
+
+      // v3.1: gambar direntangkan tepat mengikuti rasio area.
+      // Tidak dipotong dan tidak menyisakan ruang kosong.
+      ctx.drawImage(
+        ad.image,
+        r.x * GRID,
+        r.y * GRID,
+        r.w * GRID,
+        r.h * GRID
+      );
+      ctx.restore();
+
+      ctx.strokeStyle = "#16803c";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(
+        r.x * GRID + 1.5,
+        r.y * GRID + 1.5,
+        r.w * GRID - 3,
+        r.h * GRID - 3
+      );
+    }
+
+    if (selection) {
+      ctx.fillStyle = "rgba(30, 125, 255, 0.28)";
+      ctx.fillRect(
+        selection.x * GRID,
+        selection.y * GRID,
+        selection.w * GRID,
+        selection.h * GRID
+      );
+
+      ctx.strokeStyle = "#0878ff";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(
+        selection.x * GRID + 1.5,
+        selection.y * GRID + 1.5,
+        selection.w * GRID - 3,
+        selection.h * GRID - 3
+      );
+    }
   }
 
-  // Gambar iklan hanya muncul pada area yang dipilih.
-  if (ad && ad.area && ad.image) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(
-      ad.area.x, ad.area.y,
-      ad.area.width, ad.area.height
-    );
-    ctx.clip();
-
-    drawImageCover(
-      ad.image,
-      ad.area.x, ad.area.y,
-      ad.area.width, ad.area.height
-    );
-    ctx.restore();
-
-    ctx.strokeStyle = "#1769e0";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(
-      ad.area.x + 1,
-      ad.area.y + 1,
-      Math.max(0, ad.area.width - 2),
-      Math.max(0, ad.area.height - 2)
-    );
+  function pointInsideAd(point) {
+    if (!ad) return false;
+    const r = ad.rect;
+    const x = point.x / GRID;
+    const y = point.y / GRID;
+    return x >= r.x && x < r.x + r.w &&
+      y >= r.y && y < r.y + r.h;
   }
 
-  const area = getActiveArea();
+  canvas.addEventListener("pointerdown", event => {
+    event.preventDefault();
+    const point = pointerPosition(event);
 
-  if (area && area.width > 0 && area.height > 0) {
-    ctx.fillStyle = "rgba(23, 105, 224, 0.22)";
-    ctx.fillRect(
-      area.x, area.y, area.width, area.height
-    );
+    // Ketuk iklan yang sudah tampil untuk membuka alamatnya.
+    if (pointInsideAd(point) && !selection) {
+      window.open(ad.url, "_blank", "noopener,noreferrer");
+      return;
+    }
 
-    ctx.strokeStyle = "#1769e0";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(
-      area.x + 1,
-      area.y + 1,
-      Math.max(0, area.width - 2),
-      Math.max(0, area.height - 2)
-    );
-  }
-}
+    const cell = cellPosition(point);
+    dragStart = cell;
+    selection = rectangleFrom(cell, cell);
+    dragging = true;
+    canvas.setPointerCapture(event.pointerId);
+    updateStats();
+    draw();
+  });
 
-function updateStatus() {
-  const area = getActiveArea();
+  canvas.addEventListener("pointermove", event => {
+    if (!dragging || !dragStart) return;
+    event.preventDefault();
+    const cell = cellPosition(pointerPosition(event));
+    selection = rectangleFrom(dragStart, cell);
+    updateStats();
+    draw();
+  });
 
-  if (!area || !area.width || !area.height) {
-    statusText.textContent = "Belum ada area yang dipilih.";
-    priceText.textContent = "Harga: Rp0";
-    return;
-  }
-
-  const x = area.x * UNIT_PER_PIXEL;
-  const y = area.y * UNIT_PER_PIXEL;
-  const width = area.width * UNIT_PER_PIXEL;
-  const height = area.height * UNIT_PER_PIXEL;
-  const widthCells = area.width / GRID;
-  const heightCells = area.height / GRID;
-  const cells = widthCells * heightCells;
-  const price = cells * PRICE_PER_CELL;
-
-  statusText.textContent =
-    `Posisi X: ${x}, Y: ${y} | ` +
-    `Lebar: ${width} unit (${widthCells} kotak) | ` +
-    `Tinggi: ${height} unit (${heightCells} kotak) | ` +
-    `Jumlah: ${cells} kotak`;
-
-  priceText.textContent =
-    "Harga: Rp" + price.toLocaleString("id-ID");
-}
-
-canvas.addEventListener("pointerdown", event => {
-  if (event.button !== 0 && event.pointerType === "mouse") {
-    return;
+  function finishDrag() {
+    dragging = false;
+    dragStart = null;
   }
 
-  event.preventDefault();
-  const pos = getPosition(event);
+  canvas.addEventListener("pointerup", finishDrag);
+  canvas.addEventListener("pointercancel", finishDrag);
 
-  // Ketuk iklan yang sudah dipasang untuk membuka tautannya.
-  if (ad && !dragging &&
-      pos.x >= ad.area.x &&
-      pos.x <= ad.area.x + ad.area.width &&
-      pos.y >= ad.area.y &&
-      pos.y <= ad.area.y + ad.area.height) {
-    window.open(ad.url, "_blank", "noopener,noreferrer");
-    return;
-  }
+  imageFile.addEventListener("change", () => {
+    const file = imageFile.files && imageFile.files[0];
 
-  canvas.setPointerCapture(event.pointerId);
-  start = pos;
-  current = pos;
-  dragging = true;
-  selection = null;
+    uploadedImage = null;
+    if (uploadedObjectUrl) {
+      URL.revokeObjectURL(uploadedObjectUrl);
+      uploadedObjectUrl = null;
+    }
 
-  draw();
-  updateStatus();
-});
+    previewBox.hidden = true;
+    if (!file) {
+      message.textContent = "Belum ada gambar yang dipilih.";
+      return;
+    }
 
-canvas.addEventListener("pointermove", event => {
-  if (!dragging) return;
-  event.preventDefault();
+    if (!file.type.startsWith("image/")) {
+      imageFile.value = "";
+      message.textContent = "Pilih berkas gambar yang valid.";
+      return;
+    }
 
-  current = getPosition(event);
-  draw();
-  updateStatus();
-});
+    if (file.size > MAX_FILE_SIZE) {
+      imageFile.value = "";
+      message.textContent = "Ukuran gambar melebihi batas 5 MB.";
+      return;
+    }
 
-function finishSelection(event) {
-  if (!dragging) return;
+    uploadedObjectUrl = URL.createObjectURL(file);
+    const img = new Image();
 
-  if (event && event.type === "pointerup") {
-    current = getPosition(event);
-  }
+    img.onload = () => {
+      uploadedImage = img;
+      previewImage.src = uploadedObjectUrl;
+      previewBox.hidden = false;
+      message.textContent =
+        "Gambar berhasil dipilih. Sekarang masukkan URL situs.";
+    };
 
-  dragging = false;
-  selection = makeArea(start, current);
+    img.onerror = () => {
+      uploadedImage = null;
+      message.textContent = "Gambar tidak bisa dibaca. Coba berkas lain.";
+    };
 
-  start = null;
-  current = null;
+    img.src = uploadedObjectUrl;
+  });
 
-  if (!selection.width || !selection.height) {
+  publishButton.addEventListener("click", () => {
+    if (!selection) {
+      message.textContent = "Pilih area pada grid terlebih dahulu.";
+      return;
+    }
+
+    if (!uploadedImage) {
+      message.textContent = "Unggah gambar terlebih dahulu.";
+      return;
+    }
+
+    let parsedUrl;
+    try {
+      parsedUrl = new URL(adUrl.value.trim());
+    } catch (_) {
+      message.textContent = "Masukkan alamat situs yang valid.";
+      return;
+    }
+
+    if (parsedUrl.protocol !== "https:" &&
+        parsedUrl.protocol !== "http:") {
+      message.textContent = "Alamat situs harus dimulai dengan http:// atau https://.";
+      return;
+    }
+
+    ad = {
+      image: uploadedImage,
+      url: parsedUrl.href,
+      rect: { ...selection }
+    };
+
     selection = null;
-  }
+    updateStats();
+    draw();
 
-  draw();
-  updateStatus();
-}
-
-canvas.addEventListener("pointerup", finishSelection);
-canvas.addEventListener("pointercancel", finishSelection);
-
-document.getElementById("cancel").addEventListener("click", () => {
-  dragging = false;
-  start = null;
-  current = null;
-  selection = null;
-  draw();
-  updateStatus();
-});
-
-imageFile.addEventListener("change", () => {
-  const file = imageFile.files[0];
-
-  loadedImage = null;
-
-  if (imageUrl) {
-    URL.revokeObjectURL(imageUrl);
-    imageUrl = null;
-  }
-
-  if (!file) {
-    preview.hidden = true;
-    return;
-  }
-
-  if (!file.type.startsWith("image/")) {
-    message.textContent = "Pilih file gambar yang valid.";
-    imageFile.value = "";
-    return;
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
     message.textContent =
-      "Gambar terlalu besar. Pilih gambar maksimal 5 MB.";
-    imageFile.value = "";
-    preview.hidden = true;
-    return;
-  }
+      "Pratinjau iklan tampil di grid. Ketuk gambar untuk menguji tautan. " +
+      "Harga contoh: " +
+      money(ad.rect.w * ad.rect.h * CELL_PRICE) + ".";
+  });
 
-  imageUrl = URL.createObjectURL(file);
-  const img = new Image();
+  clearButton.addEventListener("click", () => {
+    ad = null;
+    selection = null;
+    updateStats();
+    draw();
+    message.textContent = "Pratinjau iklan telah dihapus.";
+  });
 
-  img.onload = () => {
-    loadedImage = img;
-    preview.src = imageUrl;
-    preview.hidden = false;
-    message.textContent = "Gambar siap digunakan.";
-  };
+  window.addEventListener("beforeunload", () => {
+    if (uploadedObjectUrl) URL.revokeObjectURL(uploadedObjectUrl);
+  });
 
-  img.onerror = () => {
-    loadedImage = null;
-    message.textContent = "Gambar tidak bisa dibaca.";
-  };
-
-  img.src = imageUrl;
-});
-
-document.getElementById("publish").addEventListener("click", () => {
-  if (!selection || !selection.width || !selection.height) {
-    message.textContent = "Pilih area pada grid terlebih dahulu.";
-    return;
-  }
-
-  if (!loadedImage) {
-    message.textContent = "Pilih gambar iklan terlebih dahulu.";
-    return;
-  }
-
-  let url;
-
-  try {
-    url = new URL(websiteInput.value.trim());
-  } catch {
-    message.textContent =
-      "Masukkan tautan lengkap, misalnya https://contoh.com";
-    return;
-  }
-
-  if (url.protocol !== "https:" && url.protocol !== "http:") {
-    message.textContent =
-      "Tautan harus menggunakan HTTP atau HTTPS.";
-    return;
-  }
-
-  if (ad) {
-    URL.revokeObjectURL(ad.imageUrl);
-  }
-
-  ad = {
-    area: { ...selection },
-    image: loadedImage,
-    imageUrl: imageUrl,
-    url: url.href
-  };
-
-  // Area dan gambar kini menjadi satu pratinjau iklan.
-  imageUrl = null;
-  selection = null;
-
+  updateStats();
   draw();
-  updateStatus();
-
-  message.textContent =
-    "Pratinjau iklan terpasang. Ketuk gambarnya pada grid " +
-    "untuk mencoba membuka website pengiklan.";
-});
-
-draw();
-updateStatus();
+})();
 </script>
-
 </body>
 </html>
+
