@@ -1,57 +1,82 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pixel Market</title>
 <style>
 * { box-sizing: border-box; }
+
 body {
   margin: 0;
   padding: 16px;
   font-family: Arial, sans-serif;
   background: #eeeeee;
-  color: #222;
+  color: #222222;
 }
+
 h1 { margin: 0 0 8px; }
+
 p { line-height: 1.5; }
+
 .panel {
   background: white;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 12px;
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
 }
+
 #world {
   display: block;
   width: 100%;
   height: auto;
   background: white;
-  border: 2px solid black;
+  border: 2px solid #222222;
   touch-action: none;
 }
+
 button {
-  padding: 10px 14px;
+  padding: 11px 14px;
   margin: 4px 4px 4px 0;
   border: 0;
-  border-radius: 6px;
+  border-radius: 7px;
   background: #1769e0;
   color: white;
   font-size: 15px;
 }
-button:disabled { opacity: .5; }
-.info { overflow-wrap: anywhere; }
+
+button.secondary {
+  background: #555555;
+}
+
+.info {
+  overflow-wrap: anywhere;
+}
+
+#price {
+  font-size: 24px;
+  font-weight: bold;
+  color: #087b39;
+}
+
+.note {
+  font-size: 13px;
+  color: #666666;
+}
 </style>
 </head>
+
 <body>
 
 <h1>Pixel Market</h1>
-<p>Pilih area iklan dengan cara menarik jari di atas grid.</p>
+<p>Pilih area untuk melihat perkiraan harga iklanmu.</p>
 
 <div class="panel">
   <strong>Ukuran kanvas:</strong> 10.000 × 10.000 unit
   <br>
   <strong>Ukuran satu kotak:</strong> 100 × 100 unit
+  <br>
+  <strong>Harga:</strong> Rp100 per kotak
 </div>
 
 <div class="panel">
@@ -59,21 +84,33 @@ button:disabled { opacity: .5; }
 </div>
 
 <div class="panel">
-  <strong>Informasi area pilihan</strong>
-  <p id="status" class="info">Belum ada area yang dipilih.</p>
+  <h3>Area iklan pilihan</h3>
+  <p id="status" class="info">
+    Belum ada area yang dipilih.
+  </p>
+
+  <p id="price">Harga: Rp0</p>
+
+  <p class="note">
+    Harga ini masih simulasi. Belum ada pembayaran sungguhan
+    dan area belum dipesan secara permanen.
+  </p>
+
   <button id="cancel">Batal pilihan</button>
-  <button id="reset">Reset kanvas</button>
+  <button id="reset" class="secondary">Reset kanvas</button>
 </div>
 
 <script>
+"use strict";
+
 const canvas = document.getElementById("world");
 const ctx = canvas.getContext("2d");
 const statusText = document.getElementById("status");
-const cancelButton = document.getElementById("cancel");
-const resetButton = document.getElementById("reset");
+const priceText = document.getElementById("price");
 
-const GRID = 10; // 10 piksel kanvas = 100 unit dunia
+const GRID = 10;
 const UNIT_PER_PIXEL = 10;
+const PRICE_PER_CELL = 100;
 
 let start = null;
 let current = null;
@@ -81,56 +118,28 @@ let dragging = false;
 let selection = null;
 
 function snap(value) {
-  return Math.max(0, Math.min(
-    canvas.width,
-    Math.round(value / GRID) * GRID
-  ));
+  return Math.max(
+    0,
+    Math.min(
+      canvas.width,
+      Math.round(value / GRID) * GRID
+    )
+  );
 }
 
 function getPosition(event) {
   const rect = canvas.getBoundingClientRect();
+
   return {
-    x: snap((event.clientX - rect.left) * canvas.width / rect.width),
-    y: snap((event.clientY - rect.top) * canvas.height / rect.height)
+    x: snap(
+      (event.clientX - rect.left) *
+      canvas.width / rect.width
+    ),
+    y: snap(
+      (event.clientY - rect.top) *
+      canvas.height / rect.height
+    )
   };
-}
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  for (let x = 0; x <= canvas.width; x += GRID) {
-    ctx.beginPath();
-    ctx.strokeStyle = (x / GRID) % 5 === 0 ? "#999999" : "#d6d6d6";
-    ctx.lineWidth = 1;
-    ctx.moveTo(x + 0.5, 0);
-    ctx.lineTo(x + 0.5, canvas.height);
-    ctx.stroke();
-  }
-
-  for (let y = 0; y <= canvas.height; y += GRID) {
-    ctx.beginPath();
-    ctx.strokeStyle = (y / GRID) % 5 === 0 ? "#999999" : "#d6d6d6";
-    ctx.lineWidth = 1;
-    ctx.moveTo(0, y + 0.5);
-    ctx.lineTo(canvas.width, y + 0.5);
-    ctx.stroke();
-  }
-
-  const area = dragging && start && current
-    ? makeArea(start, current)
-    : selection;
-
-  if (area && area.width > 0 && area.height > 0) {
-    ctx.fillStyle = "rgba(25, 105, 224, 0.25)";
-    ctx.fillRect(area.x, area.y, area.width, area.height);
-    ctx.strokeStyle = "#1769e0";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(area.x + 1, area.y + 1,
-                   Math.max(0, area.width - 2),
-                   Math.max(0, area.height - 2));
-  }
 }
 
 function makeArea(a, b) {
@@ -142,57 +151,135 @@ function makeArea(a, b) {
   };
 }
 
+function getActiveArea() {
+  if (dragging && start && current) {
+    return makeArea(start, current);
+  }
+
+  return selection;
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Menggambar grid tanpa membuat ribuan elemen HTML.
+  for (let x = 0; x <= canvas.width; x += GRID) {
+    ctx.beginPath();
+    ctx.strokeStyle =
+      (x / GRID) % 5 === 0 ? "#999999" : "#d6d6d6";
+    ctx.lineWidth = 1;
+    ctx.moveTo(x + 0.5, 0);
+    ctx.lineTo(x + 0.5, canvas.height);
+    ctx.stroke();
+  }
+
+  for (let y = 0; y <= canvas.height; y += GRID) {
+    ctx.beginPath();
+    ctx.strokeStyle =
+      (y / GRID) % 5 === 0 ? "#999999" : "#d6d6d6";
+    ctx.lineWidth = 1;
+    ctx.moveTo(0, y + 0.5);
+    ctx.lineTo(canvas.width, y + 0.5);
+    ctx.stroke();
+  }
+
+  const area = getActiveArea();
+
+  if (area && area.width > 0 && area.height > 0) {
+    ctx.fillStyle = "rgba(23, 105, 224, 0.28)";
+    ctx.fillRect(
+      area.x, area.y, area.width, area.height
+    );
+
+    ctx.strokeStyle = "#1769e0";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(
+      area.x + 1,
+      area.y + 1,
+      Math.max(0, area.width - 2),
+      Math.max(0, area.height - 2)
+    );
+  }
+}
+
 function updateStatus() {
-  if (!selection || !selection.width || !selection.height) {
-    statusText.textContent = "Belum ada area yang dipilih.";
+  const area = getActiveArea();
+
+  if (!area || area.width === 0 || area.height === 0) {
+    statusText.textContent = dragging
+      ? "Tarik jari untuk memilih area."
+      : "Belum ada area yang dipilih.";
+
+    priceText.textContent = "Harga: Rp0";
     return;
   }
 
-  const x = selection.x * UNIT_PER_PIXEL;
-  const y = selection.y * UNIT_PER_PIXEL;
-  const width = selection.width * UNIT_PER_PIXEL;
-  const height = selection.height * UNIT_PER_PIXEL;
+  const x = area.x * UNIT_PER_PIXEL;
+  const y = area.y * UNIT_PER_PIXEL;
+  const width = area.width * UNIT_PER_PIXEL;
+  const height = area.height * UNIT_PER_PIXEL;
+
+  const widthCells = area.width / GRID;
+  const heightCells = area.height / GRID;
+  const totalCells = widthCells * heightCells;
+  const price = totalCells * PRICE_PER_CELL;
 
   statusText.textContent =
-    `Posisi: X ${x}, Y ${y} | Lebar: ${width} unit | Tinggi: ${height} unit | Luas: ${width * height} unit²`;
+    `Posisi: X ${x}, Y ${y} | ` +
+    `Lebar: ${width} unit (${widthCells} kotak) | ` +
+    `Tinggi: ${height} unit (${heightCells} kotak) | ` +
+    `Jumlah: ${totalCells} kotak`;
+
+  priceText.textContent =
+    "Harga: Rp" + price.toLocaleString("id-ID");
 }
 
 canvas.addEventListener("pointerdown", event => {
-  if (event.button !== 0 && event.pointerType === "mouse") return;
+  if (event.button !== 0 && event.pointerType === "mouse") {
+    return;
+  }
+
   event.preventDefault();
   canvas.setPointerCapture(event.pointerId);
+
   start = getPosition(event);
   current = start;
   dragging = true;
   selection = null;
+
   draw();
   updateStatus();
 });
 
 canvas.addEventListener("pointermove", event => {
   if (!dragging) return;
+
   event.preventDefault();
   current = getPosition(event);
-  draw();
 
-  const preview = makeArea(start, current);
-  if (preview.width && preview.height) {
-    statusText.textContent =
-      `Sedang memilih — Lebar: ${preview.width * UNIT_PER_PIXEL} unit, Tinggi: ${preview.height * UNIT_PER_PIXEL} unit`;
-  } else {
-    statusText.textContent = "Tarik jari untuk memilih area.";
-  }
+  draw();
+  updateStatus();
 });
 
 function finishSelection(event) {
   if (!dragging) return;
-  if (event) current = getPosition(event);
+
+  if (event && event.type === "pointerup") {
+    current = getPosition(event);
+  }
+
   dragging = false;
   selection = makeArea(start, current);
+
   start = null;
   current = null;
 
-  if (!selection.width || !selection.height) selection = null;
+  if (!selection.width || !selection.height) {
+    selection = null;
+  }
+
   draw();
   updateStatus();
 }
@@ -200,25 +287,25 @@ function finishSelection(event) {
 canvas.addEventListener("pointerup", finishSelection);
 canvas.addEventListener("pointercancel", finishSelection);
 
-cancelButton.addEventListener("click", () => {
+function clearSelection() {
   dragging = false;
   start = null;
   current = null;
   selection = null;
-  draw();
-  updateStatus();
-});
 
-resetButton.addEventListener("click", () => {
-  dragging = false;
-  start = null;
-  current = null;
-  selection = null;
   draw();
   updateStatus();
-});
+}
+
+document.getElementById("cancel")
+  .addEventListener("click", clearSelection);
+
+document.getElementById("reset")
+  .addEventListener("click", clearSelection);
 
 draw();
+updateStatus();
 </script>
+
 </body>
 </html>
