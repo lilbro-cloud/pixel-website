@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Market</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      background: #eeeeee;
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 22px;
+    }
+
+    .canvas-container {
+      width: 100%;
+      overflow: auto;
+      background: #dddddd;
+      padding: 10px;
+    }
+
+    canvas {
+      display: block;
+      width: 1000px;
+      height: 1000px;
+      background: white;
+      border: 1px solid #cccccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pixel Market</h1>
+
+  <div class="canvas-container">
+    <canvas id="pixelCanvas"
+            width="1000"
+            height="1000"></canvas>
+  </div>
+</body>
+</html>
