@@ -1,516 +1,419 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pixel Market</title>
+<meta name="theme-color" content="#101827">
+<title>Pixel Market v3.2</title>
 <style>
 :root {
   color-scheme: dark;
-  --bg: #10131c;
-  --panel: #1a2030;
-  --border: #303a50;
-  --accent: #58a6ff;
-  --text: #f0f4ff;
-  --muted: #aebbd0;
+  --bg:#0b1120; --panel:#121c2e; --line:#2b3b55;
+  --text:#edf4ff; --muted:#a9bad1; --accent:#66e3c4;
 }
-* { box-sizing: border-box; }
+* { box-sizing:border-box; }
 body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, Arial, sans-serif;
+  margin:0; background:var(--bg); color:var(--text);
+  font:15px/1.5 system-ui,sans-serif;
 }
-header {
-  text-align: center;
-  padding: 24px 16px 12px;
+header { text-align:center; padding:22px 12px; }
+header h1 { margin:0; font-size:clamp(26px,5vw,40px); }
+header p { color:var(--muted); margin:8px auto; max-width:650px; }
+main { max-width:1250px; margin:auto; padding:12px; display:grid; gap:14px; }
+.panel { background:var(--panel); border:1px solid var(--line); border-radius:15px; padding:15px; min-width:0; }
+h2 { font-size:18px; margin:0 0 12px; }
+.stats { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.stat { padding:8px 10px; background:#0b1424; border:1px solid var(--line); border-radius:9px; font-size:13px; }
+.stat strong { color:var(--accent); }
+.board-wrap { width:100%; overflow:hidden; border:1px solid #40516b; border-radius:10px; background:#07101e; }
+.board {
+  position:relative; width:100%; aspect-ratio:5/3; overflow:hidden;
+  background-color:#0c1728;
+  background-image:
+    linear-gradient(#29405d99 1px,transparent 1px),
+    linear-gradient(90deg,#29405d99 1px,transparent 1px);
+  background-size:1% 1.6666667%;
+  touch-action:none; cursor:crosshair; isolation:isolate;
 }
-header h1 { margin: 0 0 8px; }
-header p { color: var(--muted); margin: 0; }
-main {
-  max-width: 1100px;
-  margin: auto;
-  padding: 16px;
+.ad-layer,.selection { position:absolute; inset:0; pointer-events:none; }
+.ad { position:absolute; display:block; object-fit:fill; border:1px solid #ffffff88; pointer-events:auto; cursor:pointer; z-index:2; }
+.selection { display:none; background:#348eff52; outline:2px solid #58b0ff; z-index:5; }
+.selection.show { display:block; }
+.hint { color:var(--muted); font-size:12px; margin:9px 0; }
+.notice { background:#102b2a; border:1px solid #245c55; color:#c7fff1; border-radius:9px; padding:10px; margin-top:10px; font-size:13px; overflow-wrap:anywhere; }
+.error { background:#321923; border-color:#703244; color:#ffdbe1; }
+.controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:12px; }
+.field { display:grid; gap:6px; min-width:0; }
+label { font-size:13px; font-weight:650; }
+input[type="url"],input[type="file"] { width:100%; min-width:0; }
+input[type="url"] { padding:11px; border-radius:9px; border:1px solid #354966; background:#0b1424; color:white; }
+input[type="file"] { font-size:13px; }
+button { border:0; border-radius:9px; padding:11px 13px; background:var(--accent); color:#06231d; font-weight:700; cursor:pointer; }
+button.secondary { background:#253650; color:white; border:1px solid #3a506e; }
+button.danger { background:#512632; color:#ffe5e9; border:1px solid #7a3a49; }
+button:disabled { opacity:.45; cursor:not-allowed; }
+.buttonrow { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.ad-list { display:grid; gap:8px; }
+.ad-item { display:flex; align-items:center; gap:10px; padding:8px; border:1px solid var(--line); border-radius:9px; background:#0d1727; min-width:0; }
+.ad-item img { width:54px; height:42px; object-fit:cover; border-radius:5px; }
+.ad-item .meta { flex:1; min-width:0; }
+.ad-item strong { display:block; font-size:13px; overflow-wrap:anywhere; }
+.ad-item small { color:var(--muted); font-size:11px; }
+.ad-item button { padding:7px 9px; font-size:12px; }
+.empty { color:var(--muted); font-size:13px; }
+footer { text-align:center; padding:18px 12px; color:var(--muted); font-size:12px; }
+@media (min-width:900px) {
+  main { grid-template-columns:minmax(0,1.6fr) minmax(300px,.8fr); align-items:start; }
+  .board-panel,.controls-panel { grid-column:1; }
+  .side { grid-column:2; grid-row:1 / span 2; }
 }
-.layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr);
-  gap: 16px;
-  align-items: start;
-}
-.panel {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
-  min-width: 0;
-}
-canvas {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
-  background: #fff;
-  border-radius: 8px;
-  touch-action: none;
-  cursor: crosshair;
-}
-.hint {
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.5;
-}
-label {
-  display: block;
-  font-weight: 650;
-  margin: 14px 0 6px;
-}
-input[type="text"], input[type="url"], input[type="file"] {
-  width: 100%;
-  padding: 11px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: #101522;
-  color: var(--text);
-}
-button {
-  width: 100%;
-  border: 0;
-  border-radius: 9px;
-  padding: 12px;
-  margin-top: 12px;
-  background: var(--accent);
-  color: #071426;
-  font-weight: 750;
-  font-size: 15px;
-  cursor: pointer;
-}
-button.secondary {
-  background: #303b50;
-  color: var(--text);
-}
-.stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 12px;
-}
-.stat {
-  background: #111725;
-  border-radius: 9px;
-  padding: 12px;
-}
-.stat small { color: var(--muted); display: block; }
-.stat strong { display: block; margin-top: 5px; overflow-wrap: anywhere; }
-#message {
-  font-size: 14px;
-  line-height: 1.5;
-  margin-top: 12px;
-  overflow-wrap: anywhere;
-}
-.preview {
-  margin-top: 14px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  padding: 10px;
-}
-.preview img {
-  display: block;
-  max-width: 100%;
-  max-height: 220px;
-  margin: 8px auto 0;
-  object-fit: contain;
-}
-@media (max-width: 760px) {
-  .layout { grid-template-columns: 1fr; }
-  main { padding: 10px; }
-  .panel { padding: 12px; }
+@media (max-width:520px) {
+  header { padding:16px 10px; }
+  .panel { padding:11px; }
+  .buttonrow button { flex:1 1 140px; }
 }
 </style>
 </head>
 <body>
 <header>
-  <h1>🟦 Pixel Market</h1>
-  <p>Pilih area pixel, pasang gambar, dan buat pratinjau iklan.</p>
+  <h1>🟩 Pixel Market</h1>
+  <p>Pasang banyak iklan di satu papan piksel persegi panjang.</p>
 </header>
 
 <main>
-  <div class="layout">
-    <section class="panel">
-      <h2>Grid Iklan</h2>
-      <canvas id="world" width="1000" height="1000"
-        aria-label="Grid untuk memilih area iklan"></canvas>
-      <p class="hint">
-        Sentuh atau klik, lalu geser pada grid untuk memilih area.
-        Lepaskan jari atau tombol mouse untuk menyelesaikan pilihan.
-      </p>
-      <div class="stats">
-        <div class="stat">
-          <small>Ukuran area</small>
-          <strong id="dimensions">Belum dipilih</strong>
-        </div>
-        <div class="stat">
-          <small>Jumlah kotak</small>
-          <strong id="cells">0</strong>
-        </div>
-        <div class="stat">
-          <small>Harga per kotak</small>
-          <strong>Rp100</strong>
-        </div>
-        <div class="stat">
-          <small>Total harga</small>
-          <strong id="price">Rp0</strong>
-        </div>
+  <section class="panel board-panel">
+    <h2>🗺️ Papan iklan landscape</h2>
+    <div class="stats">
+      <div class="stat">Papan: <strong>100 × 60 kotak</strong></div>
+      <div class="stat">Harga: <strong>Rp100/kotak</strong></div>
+      <div class="stat">Jumlah iklan: <strong id="adCount">0</strong></div>
+    </div>
+    <div class="board-wrap">
+      <div id="board" class="board" aria-label="Tarik untuk memilih area iklan">
+        <div id="adLayer" class="ad-layer"></div>
+        <div id="selection" class="selection"></div>
       </div>
-    </section>
+    </div>
+    <p class="hint">Tarik mouse atau jari untuk memilih area. Putar HP ke posisi mendatar agar papan lebih lebar.</p>
+    <div id="selectionInfo" class="notice">Belum ada area yang dipilih.</div>
+  </section>
 
-    <section class="panel">
-      <h2>Buat Iklan</h2>
-      <p class="hint">
-        Pilih area pada grid, unggah gambar, lalu masukkan alamat situs.
-        Ini masih pratinjau lokal, bukan iklan yang sudah dibayar.
-      </p>
-
-      <label for="imageFile">Gambar iklan (maksimal 5 MB)</label>
-      <input id="imageFile" type="file" accept="image/*">
-
-      <div class="preview" id="previewBox" hidden>
-        <strong>Pratinjau gambar asli</strong>
-        <img id="previewImage" alt="Pratinjau gambar yang dipilih">
+  <section class="panel controls-panel">
+    <h2>➕ Buat iklan baru</h2>
+    <div class="controls">
+      <div class="field">
+        <label for="imageFile">1. Gambar iklan (maks. 5 MB)</label>
+        <input id="imageFile" type="file" accept="image/*">
       </div>
-
-      <label for="adUrl">Alamat situs tujuan</label>
-      <input id="adUrl" type="url"
-        placeholder="https://contoh.com"
-        autocomplete="url">
-
-      <button id="publishButton">Tampilkan Pratinjau Iklan</button>
-      <button id="clearButton" class="secondary">Hapus Pratinjau Iklan</button>
-
-      <div id="message" role="status" aria-live="polite">
-        Pilih area pada grid untuk memulai.
+      <div class="field">
+        <label for="adUrl">2. URL tujuan</label>
+        <input id="adUrl" type="url" placeholder="https://contoh.com">
       </div>
+    </div>
+    <div class="buttonrow">
+      <button id="publishBtn" disabled>Pasang iklan</button>
+      <button id="clearSelectionBtn" class="secondary">Batalkan pilihan</button>
+    </div>
+    <p class="hint">Gambar akan diregangkan agar memenuhi area yang dipilih. Area iklan yang sudah terisi tidak dapat ditimpa.</p>
+    <div id="message" class="notice" role="status">Pilih area, unggah gambar, dan masukkan URL.</div>
+  </section>
 
-      <p class="hint">
-        v3.1: gambar mengikuti bentuk area pilihan. Jika area melebar,
-        gambar ikut melebar; jika area tegak, gambar ikut tegak.
-        Bentuk gambar asli dapat berubah karena menyesuaikan area.
-      </p>
-      <p class="hint">
-        Catatan: iklan dan gambar belum tersimpan permanen atau dibagikan
-        kepada pengunjung lain. Jangan gunakan untuk transaksi sungguhan.
-      </p>
-    </section>
-  </div>
+  <aside class="panel side">
+    <h2>📋 Iklan terpasang</h2>
+    <div id="adList" class="ad-list">
+      <div class="empty">Belum ada iklan.</div>
+    </div>
+    <div class="buttonrow">
+      <button id="clearAllBtn" class="danger">Hapus semua iklan</button>
+    </div>
+    <p class="hint">Ini masih prototipe lokal. Iklan tidak tersimpan permanen dan belum terlihat oleh pengunjung lain.</p>
+  </aside>
 </main>
+
+<footer>Pixel Market v3.2 • Prototipe multi-iklan</footer>
 
 <script>
 (() => {
-  "use strict";
+  const board = document.getElementById('board');
+  const adLayer = document.getElementById('adLayer');
+  const selectionEl = document.getElementById('selection');
+  const imageFile = document.getElementById('imageFile');
+  const adUrl = document.getElementById('adUrl');
+  const publishBtn = document.getElementById('publishBtn');
+  const selectionInfo = document.getElementById('selectionInfo');
+  const message = document.getElementById('message');
+  const adCount = document.getElementById('adCount');
+  const adList = document.getElementById('adList');
 
-  const canvas = document.getElementById("world");
-  const ctx = canvas.getContext("2d");
-  const imageFile = document.getElementById("imageFile");
-  const adUrl = document.getElementById("adUrl");
-  const publishButton = document.getElementById("publishButton");
-  const clearButton = document.getElementById("clearButton");
-  const dimensions = document.getElementById("dimensions");
-  const cellsLabel = document.getElementById("cells");
-  const priceLabel = document.getElementById("price");
-  const message = document.getElementById("message");
-  const previewBox = document.getElementById("previewBox");
-  const previewImage = document.getElementById("previewImage");
-
-  const GRID = 10;
-  const CELL_PRICE = 100;
-  const MAX_FILE_SIZE = 5 * 1024 * 1024;
+  const COLS = 100;
+  const ROWS = 60;
+  const PRICE = 100;
+  const MAX_FILE = 5 * 1024 * 1024;
 
   let selection = null;
-  let dragStart = null;
+  let startPoint = null;
   let dragging = false;
-  let uploadedImage = null;
-  let uploadedObjectUrl = null;
-  let ad = null;
+  let chosenImage = null;
+  let ads = [];
+  let nextId = 1;
 
-  function money(value) {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      maximumFractionDigits: 0
-    }).format(value);
+  function money(n) {
+    return 'Rp' + n.toLocaleString('id-ID');
   }
 
-  function pointerPosition(event) {
-    const rect = canvas.getBoundingClientRect();
+  function cellFromEvent(e) {
+    const r = board.getBoundingClientRect();
     return {
-      x: Math.max(0, Math.min(canvas.width,
-        (event.clientX - rect.left) * canvas.width / rect.width)),
-      y: Math.max(0, Math.min(canvas.height,
-        (event.clientY - rect.top) * canvas.height / rect.height))
+      x: Math.max(0, Math.min(COLS - 1, Math.floor((e.clientX-r.left)/r.width*COLS))),
+      y: Math.max(0, Math.min(ROWS - 1, Math.floor((e.clientY-r.top)/r.height*ROWS)))
     };
   }
 
-  function cellPosition(point) {
+  function rectangle(a, b) {
     return {
-      x: Math.max(0, Math.min(99, Math.floor(point.x / GRID))),
-      y: Math.max(0, Math.min(99, Math.floor(point.y / GRID)))
+      x:Math.min(a.x,b.x),
+      y:Math.min(a.y,b.y),
+      w:Math.abs(a.x-b.x)+1,
+      h:Math.abs(a.y-b.y)+1
     };
   }
 
-  function rectangleFrom(a, b) {
-    const left = Math.min(a.x, b.x);
-    const top = Math.min(a.y, b.y);
-    const right = Math.max(a.x, b.x) + 1;
-    const bottom = Math.max(a.y, b.y) + 1;
-
-    return {
-      x: left,
-      y: top,
-      w: right - left,
-      h: bottom - top
-    };
+  function overlaps(a, b) {
+    return a.x < b.x+b.w && a.x+a.w > b.x &&
+           a.y < b.y+b.h && a.y+a.h > b.y;
   }
 
-  function selectionCells() {
-    return selection ? selection.w * selection.h : 0;
+  function setRect(el, r) {
+    el.style.left = (r.x/COLS*100)+'%';
+    el.style.top = (r.y/ROWS*100)+'%';
+    el.style.width = (r.w/COLS*100)+'%';
+    el.style.height = (r.h/ROWS*100)+'%';
   }
 
-  function updateStats() {
+  function say(text, error=false) {
+    message.textContent = text;
+    message.classList.toggle('error', error);
+  }
+
+  function updateSelection() {
     if (!selection) {
-      dimensions.textContent = "Belum dipilih";
-      cellsLabel.textContent = "0";
-      priceLabel.textContent = money(0);
+      selectionEl.classList.remove('show');
+      selectionInfo.textContent = 'Belum ada area yang dipilih.';
+      publishBtn.disabled = true;
       return;
     }
 
-    dimensions.textContent =
-      selection.w + " × " + selection.h + " kotak";
-    cellsLabel.textContent = selectionCells().toLocaleString("id-ID");
-    priceLabel.textContent = money(selectionCells() * CELL_PRICE);
+    setRect(selectionEl, selection);
+    selectionEl.classList.add('show');
+
+    const cells = selection.w * selection.h;
+    const conflict = ads.some(ad => overlaps(ad.rect, selection));
+
+    selectionInfo.textContent =
+      `Area ${selection.w} × ${selection.h} kotak • ` +
+      `${cells} kotak • Harga ${money(cells*PRICE)}` +
+      (conflict ? ' • Area bertabrakan dengan iklan lama!' : '');
+
+    publishBtn.disabled = !(chosenImage && adUrl.value.trim()) || conflict;
   }
 
-  function drawGrid() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  function renderAds() {
+    adLayer.innerHTML = '';
 
-    ctx.strokeStyle = "#d8dee8";
-    ctx.lineWidth = 1;
+    for (const ad of ads) {
+      const img = document.createElement('img');
+      img.className = 'ad';
+      img.src = ad.dataUrl;
+      img.alt = ad.name;
+      img.title = ad.name + ' — klik untuk membuka website';
+      img.draggable = false;
+      setRect(img, ad.rect);
 
-    for (let p = 0; p <= canvas.width; p += GRID) {
-      ctx.beginPath();
-      ctx.moveTo(p + 0.5, 0);
-      ctx.lineTo(p + 0.5, canvas.height);
-      ctx.stroke();
+      img.addEventListener('click', e => {
+        e.stopPropagation();
+        window.open(ad.url, '_blank', 'noopener,noreferrer');
+      });
 
-      ctx.beginPath();
-      ctx.moveTo(0, p + 0.5);
-      ctx.lineTo(canvas.width, p + 0.5);
-      ctx.stroke();
-    }
-  }
-
-  function draw() {
-    drawGrid();
-
-    if (ad) {
-      const r = ad.rect;
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(r.x * GRID, r.y * GRID,
-        r.w * GRID, r.h * GRID);
-      ctx.clip();
-
-      // v3.1: gambar direntangkan tepat mengikuti rasio area.
-      // Tidak dipotong dan tidak menyisakan ruang kosong.
-      ctx.drawImage(
-        ad.image,
-        r.x * GRID,
-        r.y * GRID,
-        r.w * GRID,
-        r.h * GRID
-      );
-      ctx.restore();
-
-      ctx.strokeStyle = "#16803c";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(
-        r.x * GRID + 1.5,
-        r.y * GRID + 1.5,
-        r.w * GRID - 3,
-        r.h * GRID - 3
-      );
+      adLayer.appendChild(img);
     }
 
-    if (selection) {
-      ctx.fillStyle = "rgba(30, 125, 255, 0.28)";
-      ctx.fillRect(
-        selection.x * GRID,
-        selection.y * GRID,
-        selection.w * GRID,
-        selection.h * GRID
-      );
+    adCount.textContent = ads.length;
+    adList.innerHTML = '';
 
-      ctx.strokeStyle = "#0878ff";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(
-        selection.x * GRID + 1.5,
-        selection.y * GRID + 1.5,
-        selection.w * GRID - 3,
-        selection.h * GRID - 3
-      );
-    }
-  }
-
-  function pointInsideAd(point) {
-    if (!ad) return false;
-    const r = ad.rect;
-    const x = point.x / GRID;
-    const y = point.y / GRID;
-    return x >= r.x && x < r.x + r.w &&
-      y >= r.y && y < r.y + r.h;
-  }
-
-  canvas.addEventListener("pointerdown", event => {
-    event.preventDefault();
-    const point = pointerPosition(event);
-
-    // Ketuk iklan yang sudah tampil untuk membuka alamatnya.
-    if (pointInsideAd(point) && !selection) {
-      window.open(ad.url, "_blank", "noopener,noreferrer");
+    if (!ads.length) {
+      adList.innerHTML = '<div class="empty">Belum ada iklan.</div>';
       return;
     }
 
-    const cell = cellPosition(point);
-    dragStart = cell;
-    selection = rectangleFrom(cell, cell);
+    for (const ad of ads) {
+      const item = document.createElement('div');
+      item.className = 'ad-item';
+
+      const thumb = document.createElement('img');
+      thumb.src = ad.dataUrl;
+      thumb.alt = '';
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+
+      const title = document.createElement('strong');
+      title.textContent = ad.name;
+
+      const detail = document.createElement('small');
+      detail.textContent =
+        `${ad.rect.w} × ${ad.rect.h} kotak • ` +
+        money(ad.rect.w * ad.rect.h * PRICE);
+
+      meta.append(title, detail);
+
+      const remove = document.createElement('button');
+      remove.className = 'danger';
+      remove.textContent = 'Hapus';
+      remove.addEventListener('click', () => {
+        ads = ads.filter(a => a.id !== ad.id);
+        renderAds();
+        updateSelection();
+        say('Iklan dihapus. Iklan lainnya tetap ada.');
+      });
+
+      item.append(thumb, meta, remove);
+      adList.appendChild(item);
+    }
+  }
+
+  board.addEventListener('pointerdown', e => {
+    if (e.target.classList.contains('ad')) return;
+    const p = cellFromEvent(e);
     dragging = true;
-    canvas.setPointerCapture(event.pointerId);
-    updateStats();
-    draw();
+    startPoint = p;
+    selection = rectangle(p, p);
+    try { board.setPointerCapture(e.pointerId); } catch {}
+    updateSelection();
   });
 
-  canvas.addEventListener("pointermove", event => {
-    if (!dragging || !dragStart) return;
-    event.preventDefault();
-    const cell = cellPosition(pointerPosition(event));
-    selection = rectangleFrom(dragStart, cell);
-    updateStats();
-    draw();
+  board.addEventListener('pointermove', e => {
+    if (!dragging || !startPoint) return;
+    selection = rectangle(startPoint, cellFromEvent(e));
+    updateSelection();
   });
 
-  function finishDrag() {
+  function endDrag() {
+    if (!dragging) return;
     dragging = false;
-    dragStart = null;
+    startPoint = null;
+
+    if (selection && ads.some(ad => overlaps(ad.rect, selection))) {
+      say('Area bertabrakan dengan iklan lama. Pilih area kosong.', true);
+    } else if (selection) {
+      say('Area dipilih. Unggah gambar dan masukkan URL.');
+    }
   }
 
-  canvas.addEventListener("pointerup", finishDrag);
-  canvas.addEventListener("pointercancel", finishDrag);
+  board.addEventListener('pointerup', endDrag);
+  board.addEventListener('pointercancel', endDrag);
 
-  imageFile.addEventListener("change", () => {
+  imageFile.addEventListener('change', () => {
     const file = imageFile.files && imageFile.files[0];
+    chosenImage = null;
 
-    uploadedImage = null;
-    if (uploadedObjectUrl) {
-      URL.revokeObjectURL(uploadedObjectUrl);
-      uploadedObjectUrl = null;
-    }
-
-    previewBox.hidden = true;
     if (!file) {
-      message.textContent = "Belum ada gambar yang dipilih.";
+      updateSelection();
       return;
     }
 
-    if (!file.type.startsWith("image/")) {
-      imageFile.value = "";
-      message.textContent = "Pilih berkas gambar yang valid.";
+    if (file.size > MAX_FILE) {
+      say('Ukuran gambar lebih dari 5 MB. Pilih gambar yang lebih kecil.', true);
+      imageFile.value = '';
+      updateSelection();
       return;
     }
 
-    if (file.size > MAX_FILE_SIZE) {
-      imageFile.value = "";
-      message.textContent = "Ukuran gambar melebihi batas 5 MB.";
+    if (!file.type.startsWith('image/')) {
+      say('File harus berupa gambar.', true);
+      imageFile.value = '';
+      updateSelection();
       return;
     }
 
-    uploadedObjectUrl = URL.createObjectURL(file);
-    const img = new Image();
+    const reader = new FileReader();
 
-    img.onload = () => {
-      uploadedImage = img;
-      previewImage.src = uploadedObjectUrl;
-      previewBox.hidden = false;
-      message.textContent =
-        "Gambar berhasil dipilih. Sekarang masukkan URL situs.";
+    reader.onload = () => {
+      chosenImage = { dataUrl:reader.result, name:file.name };
+      updateSelection();
+      say('Gambar siap. Sekarang masukkan URL tujuan.');
     };
 
-    img.onerror = () => {
-      uploadedImage = null;
-      message.textContent = "Gambar tidak bisa dibaca. Coba berkas lain.";
-    };
-
-    img.src = uploadedObjectUrl;
+    reader.onerror = () => say('Gambar gagal dibaca. Coba pilih file lain.', true);
+    reader.readAsDataURL(file);
   });
 
-  publishButton.addEventListener("click", () => {
-    if (!selection) {
-      message.textContent = "Pilih area pada grid terlebih dahulu.";
+  adUrl.addEventListener('input', updateSelection);
+
+  publishBtn.addEventListener('click', () => {
+    if (!selection || !chosenImage) {
+      say('Pilih area dan gambar terlebih dahulu.', true);
       return;
     }
 
-    if (!uploadedImage) {
-      message.textContent = "Unggah gambar terlebih dahulu.";
-      return;
-    }
+    let url;
 
-    let parsedUrl;
     try {
-      parsedUrl = new URL(adUrl.value.trim());
-    } catch (_) {
-      message.textContent = "Masukkan alamat situs yang valid.";
+      url = new URL(adUrl.value.trim());
+      if (!['http:', 'https:'].includes(url.protocol)) throw new Error();
+    } catch {
+      say('URL harus diawali https:// atau http://.', true);
       return;
     }
 
-    if (parsedUrl.protocol !== "https:" &&
-        parsedUrl.protocol !== "http:") {
-      message.textContent = "Alamat situs harus dimulai dengan http:// atau https://.";
+    if (ads.some(ad => overlaps(ad.rect, selection))) {
+      say('Area ini bertabrakan dengan iklan yang sudah ada.', true);
       return;
     }
 
-    ad = {
-      image: uploadedImage,
-      url: parsedUrl.href,
-      rect: { ...selection }
-    };
+    const rect = { ...selection };
 
+    ads.push({
+      id:nextId++,
+      rect,
+      dataUrl:chosenImage.dataUrl,
+      name:chosenImage.name,
+      url:url.href
+    });
+
+    renderAds();
     selection = null;
-    updateStats();
-    draw();
-
-    message.textContent =
-      "Pratinjau iklan tampil di grid. Ketuk gambar untuk menguji tautan. " +
-      "Harga contoh: " +
-      money(ad.rect.w * ad.rect.h * CELL_PRICE) + ".";
+    chosenImage = null;
+    imageFile.value = '';
+    adUrl.value = '';
+    updateSelection();
+    say('Berhasil! Iklan baru dipasang. Iklan sebelumnya tetap ada.');
   });
 
-  clearButton.addEventListener("click", () => {
-    ad = null;
+  document.getElementById('clearSelectionBtn').addEventListener('click', () => {
     selection = null;
-    updateStats();
-    draw();
-    message.textContent = "Pratinjau iklan telah dihapus.";
+    updateSelection();
+    say('Pilihan area dibatalkan. Iklan yang sudah terpasang tetap ada.');
   });
 
-  window.addEventListener("beforeunload", () => {
-    if (uploadedObjectUrl) URL.revokeObjectURL(uploadedObjectUrl);
+  document.getElementById('clearAllBtn').addEventListener('click', () => {
+    if (!ads.length) {
+      say('Belum ada iklan untuk dihapus.');
+      return;
+    }
+
+    if (confirm('Hapus semua iklan dari papan ini?')) {
+      ads = [];
+      renderAds();
+      updateSelection();
+      say('Semua iklan sudah dihapus.');
+    }
   });
 
-  updateStats();
-  draw();
+  updateSelection();
+  renderAds();
 })();
 </script>
 </body>
-</html>
-
+  </html>
+  
