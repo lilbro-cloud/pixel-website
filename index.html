@@ -4,847 +4,358 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pixel Market v3.5</title>
-
+<title>Pixel Market v3.6</title>
 <style>
 :root {
-  --bg: #0b1020;
-  --panel: #141c31;
-  --panel2: #1b2740;
-  --primary: #7c5cff;
-  --secondary: #20d9c3;
-  --text: #f3f5ff;
-  --muted: #a5b1cc;
-  --danger: #ff6078;
-  --border: #2a3754;
+  --bg:#0b1020; --panel:#141c31; --panel2:#1b2740;
+  --primary:#7c5cff; --teal:#20d9c3; --text:#f3f5ff;
+  --muted:#a5b1cc; --border:#2a3754; --danger:#ff6078;
 }
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  color: var(--text);
-  background:
-    radial-gradient(ellipse at top, #202a50 0%, transparent 48%),
-    var(--bg);
-  font-family: system-ui, -apple-system, sans-serif;
-}
-
-button, input {
-  font: inherit;
-}
-
-button { cursor: pointer; }
-
-header {
-  padding: 22px 16px;
-  border-bottom: 1px solid var(--border);
-  background: #0b1020dd;
-}
-
-.header-inner, main {
-  width: min(1100px, 100%);
-  margin: auto;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo {
-  width: 48px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  border-radius: 15px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
-  font-size: 24px;
-  font-weight: 900;
-  box-shadow: 0 5px 25px #7c5cff40;
-}
-
-h1 { font-size: 23px; margin: 0; }
-.subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; }
-
-main { padding: 20px 14px 45px; }
-
-h2 { font-size: 17px; margin: 0 0 14px; }
-h3 { font-size: 15px; margin: 0 0 12px; }
-
-.panel {
-  background: linear-gradient(145deg, var(--panel), #11182a);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 17px;
-  margin-bottom: 18px;
-  box-shadow: 0 10px 35px #00000018;
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 18px;
-}
-
-.stat {
-  padding: 15px 10px;
-  border-radius: 14px;
-  background: var(--panel2);
-  border: 1px solid var(--border);
-}
-
-.stat strong {
-  display: block;
-  font-size: 23px;
-  color: var(--secondary);
-}
-
-.stat span { font-size: 11px; color: var(--muted); }
-
-.field { margin-bottom: 14px; }
-
-label {
-  display: block;
-  font-size: 13px;
-  color: #dbe3fa;
-  margin-bottom: 7px;
-}
-
-input[type="text"], input[type="url"] {
-  width: 100%;
-  padding: 12px;
-  color: white;
-  background: #0b1223;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  outline: none;
-}
-
-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px #7c5cff25;
-}
-
-.gallery-button {
-  display: flex;
-  width: 100%;
-  min-height: 82px;
-  gap: 13px;
-  align-items: center;
-  text-align: left;
-  padding: 13px;
-  border: 1px solid #6552ca;
-  border-radius: 14px;
-  color: white;
-  background: linear-gradient(120deg, #302765, #20364c);
-  transition: .2s;
-}
-
-.gallery-button:hover {
-  border-color: var(--secondary);
-  transform: translateY(-1px);
-}
-
-.gallery-icon {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 49px;
-  height: 49px;
-  border-radius: 13px;
-  background: linear-gradient(135deg, var(--primary), #3c9eea);
-  font-size: 24px;
-}
-
-.gallery-button strong { display: block; margin-bottom: 4px; }
-.gallery-button small { color: #c1c9e4; }
-
-#fileInput { display: none; }
-
-.preview-wrap {
-  display: none;
-  margin-top: 12px;
-  padding: 10px;
-  background: #0b1223;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-}
-
-.preview-wrap img {
-  display: block;
-  width: 100%;
-  max-height: 230px;
-  object-fit: contain;
-  border-radius: 8px;
-}
-
-.preview-name {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 8px;
-  overflow-wrap: anywhere;
-}
-
-.row-buttons {
-  display: flex;
-  gap: 9px;
-  flex-wrap: wrap;
-  margin-top: 14px;
-}
-
-.btn {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 11px 14px;
-  color: white;
-  background: var(--panel2);
-}
-
-.btn-primary {
-  border: none;
-  background: linear-gradient(120deg, var(--primary), #5d8dff);
-  font-weight: 700;
-}
-
-.btn-secondary { background: #17243a; }
-.btn-danger { color: #ffb5c0; border-color: #743546; }
-.btn:active { transform: scale(.98); }
-
-.help {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.6;
-  margin-top: 10px;
-}
-
-.board {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-  touch-action: none;
-  border: 2px solid #4c5781;
-  border-radius: 12px;
-  background-color: #10182a;
-  background-image:
-    linear-gradient(#2b3850 1px, transparent 1px),
-    linear-gradient(90deg, #2b3850 1px, transparent 1px);
-  background-size: 5% 5%;
-  user-select: none;
-}
-
-.board-label {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 5;
-  padding: 5px 8px;
-  border-radius: 7px;
-  background: #080d1ccc;
-  font-size: 11px;
-  color: #cbd5f2;
-  pointer-events: none;
-}
-
-.ad-box {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border: 1px solid #b5a8ff;
-  background: #27334b;
-  color: white;
-  cursor: pointer;
-}
-
-.ad-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  pointer-events: none;
-}
-
-.ad-box span {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 4px;
-  background: #080d1cbb;
-  font-size: 10px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.selection {
-  position: absolute;
-  z-index: 4;
-  border: 2px dashed var(--secondary);
-  background: #20d9c326;
-  pointer-events: none;
-}
-
-.selection-info {
-  margin-top: 10px;
-  padding: 11px;
-  background: #0b1223;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--secondary);
-  font-size: 12px;
-  overflow-wrap: anywhere;
-}
-
-.ad-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
-}
-
-.ad-card {
-  overflow: hidden;
-  background: #10182a;
-  border: 1px solid var(--border);
-  border-radius: 13px;
-}
-
-.ad-card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  background: var(--panel2);
-  display: block;
-}
-
-.ad-content { padding: 12px; }
-.ad-content h3 { overflow-wrap: anywhere; }
-.ad-url {
-  color: #9cafff;
-  font-size: 12px;
-  overflow-wrap: anywhere;
-  margin: 8px 0;
-}
-
-.empty {
-  text-align: center;
-  color: var(--muted);
-  padding: 25px 10px;
-  border: 1px dashed var(--border);
-  border-radius: 12px;
-  font-size: 13px;
-}
-
-#message {
-  display: none;
-  margin-bottom: 15px;
-  padding: 12px;
-  border-radius: 10px;
-  background: #173b39;
-  color: #aaffef;
-  font-size: 13px;
-  overflow-wrap: anywhere;
-}
-
-footer {
-  text-align: center;
-  color: var(--muted);
-  font-size: 12px;
-  padding: 20px 10px;
-}
-
-@media (min-width: 760px) {
-  .editor-layout {
-    display: grid;
-    grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
-    gap: 18px;
-    align-items: start;
-  }
-}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#202a50,transparent 48%),var(--bg);color:var(--text);font-family:system-ui,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+header{padding:20px 15px;border-bottom:1px solid var(--border);background:#0b1020dd}
+.wrap{width:min(1120px,100%);margin:auto}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--teal));font-size:24px;font-weight:900}
+h1{font-size:23px;margin:0}
+.sub{color:var(--muted);font-size:12px;margin-top:4px}
+main{padding:20px 14px 45px}
+h2{font-size:17px;margin:0 0 14px}
+h3{font-size:14px;margin:0 0 9px;overflow-wrap:anywhere}
+.panel{padding:17px;background:linear-gradient(145deg,var(--panel),#11182a);border:1px solid var(--border);border-radius:17px;margin-bottom:17px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-bottom:17px}
+.stat{padding:13px 10px;background:var(--panel2);border:1px solid var(--border);border-radius:13px}
+.stat strong{display:block;font-size:23px;color:var(--teal)}
+.stat span{font-size:11px;color:var(--muted)}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:17px}
+.nav button{flex:1;min-width:100px}
+.btn{padding:10px 13px;border:1px solid var(--border);border-radius:10px;background:var(--panel2);color:white}
+.primary{background:linear-gradient(120deg,var(--primary),#5d8dff);border:0;font-weight:700}
+.danger{color:#ffb5c0;border-color:#743546}
+.field{margin-bottom:13px}
+label{display:block;font-size:13px;margin-bottom:7px;color:#dbe3fa}
+input[type=text],input[type=url],select{width:100%;padding:12px;color:white;background:#0b1223;border:1px solid var(--border);border-radius:10px;outline:none}
+input:focus,select:focus{border-color:var(--primary)}
+.gallery{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:13px;border:1px solid #6552ca;border-radius:14px;color:white;background:linear-gradient(120deg,#302765,#20364c)}
+.gallery-icon{width:47px;height:47px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,var(--primary),#3c9eea);font-size:24px;flex-shrink:0}
+.gallery small{display:block;color:#c1c9e4;margin-top:4px}
+#fileInput{display:none}
+#previewWrap{display:none;margin-top:10px;padding:10px;background:#0b1223;border:1px solid var(--border);border-radius:12px}
+#preview{display:block;width:100%;max-height:210px;object-fit:contain}
+.help{font-size:12px;line-height:1.6;color:var(--muted);margin-top:10px}
+.layout{display:grid;gap:17px}
+.board{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;overscroll-behavior:contain;border:2px solid #4c5781;border-radius:12px;background-color:#10182a;background-image:linear-gradient(#2b3850 1px,transparent 1px),linear-gradient(90deg,#2b3850 1px,transparent 1px);background-size:5% 5%}
+.board-label{position:absolute;z-index:2;top:8px;left:8px;padding:5px 8px;border-radius:7px;background:#080d1ccc;font-size:11px;color:#cbd5f2;pointer-events:none}
+.ad-box{position:absolute;overflow:hidden;border:1px solid #b5a8ff;background:#27334b;pointer-events:none}
+.ad-box img{width:100%;height:100%;object-fit:cover;display:block}
+.ad-box span{position:absolute;bottom:0;left:0;right:0;padding:4px;background:#080d1cbb;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.selection{position:absolute;z-index:5;border:2px dashed var(--teal);background:#20d9c326;pointer-events:none}
+.info{margin-top:10px;padding:11px;background:#0b1223;border:1px solid var(--border);border-radius:10px;color:var(--teal);font-size:12px;overflow-wrap:anywhere}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.row .btn{flex:1}
+.list{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.card{overflow:hidden;border:1px solid var(--border);border-radius:13px;background:#10182a}
+.card img{width:100%;height:135px;object-fit:cover;display:block;background:var(--panel2)}
+.card-content{padding:12px}
+.url{font-size:12px;color:#9cafff;overflow-wrap:anywhere;margin:7px 0}
+.badge{display:inline-block;font-size:11px;border-radius:20px;padding:4px 8px;background:#173b39;color:#aaffef;margin-bottom:9px}
+.badge.draft{background:#49391c;color:#ffe1a0}
+.empty{padding:22px 10px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:12px;font-size:13px}
+#message{display:none;padding:12px;border-radius:10px;background:#173b39;color:#aaffef;font-size:13px;margin-bottom:14px;overflow-wrap:anywhere}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+@media(min-width:780px){.layout{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)}}
 </style>
 </head>
-
 <body>
-<header>
-  <div class="header-inner">
-    <div class="brand">
-      <div class="logo">P</div>
-      <div>
-        <h1>Pixel Market</h1>
-        <div class="subtitle">v3.5 · Modern Ad Studio</div>
-      </div>
-    </div>
+<header><div class="wrap brand">
+  <div class="logo">P</div><div><h1>Pixel Market</h1><div class="sub">v3.6 · Dashboard & Touch Fix</div></div>
+</div></header>
+
+<main class="wrap">
+<div id="message" role="status"></div>
+
+<section class="stats">
+  <div class="stat"><strong id="total">0</strong><span>Total iklan</span></div>
+  <div class="stat"><strong id="active">0</strong><span>Iklan aktif</span></div>
+  <div class="stat"><strong id="free">100%</strong><span>Area kosong</span></div>
+</section>
+
+<nav class="nav">
+  <button class="btn primary" onclick="showSection('dashboard')">⌂ Dashboard</button>
+  <button class="btn" onclick="showSection('editor')">＋ Buat iklan</button>
+  <button class="btn" onclick="showSection('listSection')">▤ Daftar iklan</button>
+</nav>
+
+<section id="dashboard" class="panel">
+  <h2>📊 Dashboard</h2>
+  <p class="help">Kelola iklan dari satu tempat. Perubahan tersimpan di browser ini, bukan ke server publik.</p>
+  <div class="row">
+    <button class="btn primary" onclick="showSection('editor')">Buat iklan baru</button>
+    <button class="btn" onclick="showSection('listSection')">Kelola iklan</button>
   </div>
-</header>
+</section>
 
-<main>
-  <div id="message" role="status"></div>
-
-  <section class="stats">
-    <div class="stat">
-      <strong id="statAds">0</strong>
-      <span>Total iklan</span>
-    </div>
-    <div class="stat">
-      <strong id="statArea">0%</strong>
-      <span>Area terpakai</span>
-    </div>
-    <div class="stat">
-      <strong id="statFree">100%</strong>
-      <span>Area tersedia</span>
-    </div>
-  </section>
-
-  <div class="editor-layout">
-    <section class="panel">
-      <h2>🎨 Buat iklan</h2>
-
-      <div class="field">
-        <label for="adName">Nama iklan</label>
-        <input id="adName" type="text" maxlength="80"
-          placeholder="Contoh: Pixel Store">
-      </div>
-
-      <div class="field">
-        <label for="adUrl">Tautan tujuan iklan</label>
-        <input id="adUrl" type="url"
-          placeholder="https://contoh.com">
-      </div>
-
-      <div class="field">
-        <label>Gambar utama</label>
-
-        <button type="button" class="gallery-button"
-          id="galleryButton">
-          <span class="gallery-icon">▧</span>
-          <span>
-            <strong>📁 Pilih gambar dari galeri</strong>
-            <small>JPG, PNG, WEBP · Maksimal 5 MB</small>
-          </span>
-        </button>
-
-        <input id="fileInput" type="file" accept="image/*">
-
-        <div class="preview-wrap" id="previewWrap">
-          <img id="previewImage" alt="Pratinjau gambar iklan">
-          <div class="preview-name" id="previewName"></div>
-          <button type="button" class="btn btn-secondary"
-            id="removeImage" style="margin-top:10px">
-            Ganti gambar
-          </button>
-        </div>
-      </div>
-
-      <div class="row-buttons">
-        <button class="btn btn-primary" id="saveButton">
-          ＋ Simpan iklan
-        </button>
-        <button class="btn btn-secondary" id="resetButton">
-          Bersihkan form
-        </button>
-      </div>
-
-      <div class="help">
-        1. Isi nama dan tautan iklan.<br>
-        2. Pilih gambar dari galeri.<br>
-        3. Tarik jari atau mouse pada papan untuk menentukan
-        ukuran dan posisi iklan.<br>
-        4. Tekan Simpan iklan.
-      </div>
-
-      <div class="selection-info" id="selectionInfo">
-        Belum ada area dipilih. Tarik pada papan iklan.
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>▦ Papan iklan</h2>
-      <div class="board" id="board">
-        <div class="board-label">10.000 × 10.000 unit</div>
-      </div>
-      <div class="help">
-        Tarik untuk memilih area persegi panjang. Area iklan
-        tidak boleh bertumpuk. Tekan iklan yang sudah ada
-        untuk membuka tautannya.
-      </div>
-      <div class="row-buttons">
-        <button class="btn btn-secondary" id="clearSelection">
-          Batalkan area
-        </button>
-      </div>
-    </section>
+<div class="layout">
+<section id="editor" class="panel">
+  <h2 id="formTitle">🎨 Editor iklan</h2>
+  <div class="field"><label for="adName">Nama iklan</label><input id="adName" type="text" maxlength="80" placeholder="Contoh: Pixel Store"></div>
+  <div class="field"><label for="adUrl">Tautan tujuan</label><input id="adUrl" type="url" placeholder="https://contoh.com"></div>
+  <div class="field">
+    <label>Gambar utama</label>
+    <button class="gallery" id="galleryButton" type="button">
+      <span class="gallery-icon">▧</span><span><b>Pilih gambar dari galeri</b><small>JPG, PNG, WEBP · Maksimal 5 MB</small></span>
+    </button>
+    <input id="fileInput" type="file" accept="image/*">
+    <div id="previewWrap"><img id="preview" alt="Pratinjau gambar"><div id="previewName" class="help"></div><button id="removeImage" class="btn" type="button">Lepas gambar baru</button></div>
   </div>
+  <div class="field"><label for="adStatus">Status awal</label><select id="adStatus"><option value="active">Aktif</option><option value="draft">Draf</option></select></div>
+  <div class="row">
+    <button class="btn primary" id="saveButton">＋ Simpan iklan</button>
+    <button class="btn" id="resetButton">Bersihkan</button>
+  </div>
+  <div class="help">Pilih gambar, isi tautan, lalu tarik jari pada papan untuk menentukan posisi dan ukuran. Area iklan tidak boleh bertumpuk.</div>
+  <div class="info" id="selectionInfo">Belum ada area dipilih. Tarik pada papan.</div>
+</section>
 
-  <section class="panel">
-    <h2>🗂️ Daftar iklan</h2>
-    <div id="adList" class="ad-list">
-      <div class="empty">Memuat iklan...</div>
-    </div>
-  </section>
+<section class="panel">
+  <h2>▦ Papan iklan</h2>
+  <div id="board" class="board"><div class="board-label">10.000 × 10.000 unit</div></div>
+  <div class="help">Sentuh area kosong lalu geser jari. Kotak seleksi tidak menangkap sentuhan, jadi gerakan jari tetap bisa terbaca.</div>
+  <div class="row"><button id="clearSelection" class="btn">Batalkan area</button></div>
+</section>
+</div>
+
+<section id="listSection" class="panel">
+  <div class="section-title"><h2>🗂️ Daftar iklan</h2><span class="sub" id="resultCount">0 iklan</span></div>
+  <div class="field"><label for="search">Cari iklan</label><input id="search" type="text" placeholder="Ketik nama iklan..."></div>
+  <div class="field"><label for="filterStatus">Filter status</label><select id="filterStatus"><option value="all">Semua status</option><option value="active">Aktif</option><option value="draft">Draf</option></select></div>
+  <div id="adList" class="list"><div class="empty">Memuat...</div></div>
+</section>
 </main>
-
-<footer>Pixel Market v3.5 · Semua fitur dalam satu halaman</footer>
+<footer>Pixel Market v3.6 · Modern Ad Studio</footer>
 
 <script>
 "use strict";
+const DB_NAME="PixelMarketDatabase";
+const STORE="ads";
+const SIZE=10000;
+const MAX=5*1024*1024;
+const $=id=>document.getElementById(id);
 
-const DB_NAME = "PixelMarketDatabase";
-const STORE_NAME = "ads";
-const DB_VERSION = 1;
-const BOARD_SIZE = 10000;
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+let db,ads=[],selectedImage=null,selectedRect=null,editingId=null;
+let drag=null,selection=null,previewUrl=null,renderUrls=[];
 
-const $ = id => document.getElementById(id);
-
-let db;
-let ads = [];
-let selectedImage = null;
-let selectedRect = null;
-let editingId = null;
-let dragStart = null;
-let currentSelection = null;
-let imageUrls = [];
-
-function showMessage(message) {
-  const box = $("message");
-  box.textContent = message;
-  box.style.display = "block";
-  clearTimeout(showMessage.timer);
-  showMessage.timer = setTimeout(() => {
-    box.style.display = "none";
-  }, 4500);
+function message(text){
+  const el=$("message");el.textContent=text;el.style.display="block";
+  clearTimeout(message.timer);message.timer=setTimeout(()=>el.style.display="none",4500);
 }
-
-function openDatabase() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-    request.onupgradeneeded = () => {
-      const database = request.result;
-      if (!database.objectStoreNames.contains(STORE_NAME)) {
-        database.createObjectStore(STORE_NAME, { keyPath: "id" });
-      }
-    };
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+function showSection(id){
+  const el=$(id);if(!el)return;
+  el.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open(DB_NAME,1);
+    req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(STORE))req.result.createObjectStore(STORE,{keyPath:"id"});};
+    req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
   });
 }
-
-function getAllAds() {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readonly");
-    const request = tx.objectStore(STORE_NAME).getAll();
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+function allAds(){
+  return new Promise((resolve,reject)=>{
+    const req=db.transaction(STORE,"readonly").objectStore(STORE).getAll();
+    req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
   });
 }
-
-function saveToDatabase(ad) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    tx.objectStore(STORE_NAME).put(ad);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error || new Error("Transaksi dibatalkan"));
+function putAd(ad){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,"readwrite");
+    tx.objectStore(STORE).put(ad);
+    tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
   });
 }
-
-function deleteFromDatabase(id) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    tx.objectStore(STORE_NAME).delete(id);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error || new Error("Transaksi dibatalkan"));
+function deleteAdDB(id){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,"readwrite");
+    tx.objectStore(STORE).delete(id);
+    tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
   });
 }
-
-function makeImageUrl(blob) {
-  const url = URL.createObjectURL(blob);
-  imageUrls.push(url);
-  return url;
+function urlFor(blob){const u=URL.createObjectURL(blob);renderUrls.push(u);return u;}
+function clearRenderUrls(){renderUrls.forEach(URL.revokeObjectURL);renderUrls=[];}
+function overlaps(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;}
+function usedArea(){return ads.reduce((n,a)=>n+a.rect.w*a.rect.h,0);}
+function stats(){
+  $("total").textContent=ads.length;
+  $("active").textContent=ads.filter(a=>a.status==="active").length;
+  $("free").textContent=Math.max(0,100-usedArea()/SIZE**2*100).toFixed(2)+"%";
 }
-
-function clearImageUrls() {
-  for (const url of imageUrls) URL.revokeObjectURL(url);
-  imageUrls = [];
-}
-
-function overlaps(a, b) {
-  return a.x < b.x + b.w &&
-         a.x + a.w > b.x &&
-         a.y < b.y + b.h &&
-         a.y + a.h > b.y;
-}
-
-function getUsedArea() {
-  return ads.reduce((sum, ad) => sum + ad.rect.w * ad.rect.h, 0);
-}
-
-function updateStats() {
-  const used = getUsedArea() / (BOARD_SIZE * BOARD_SIZE) * 100;
-  $("statAds").textContent = ads.length;
-  $("statArea").textContent = used.toFixed(2) + "%";
-  $("statFree").textContent = Math.max(0, 100 - used).toFixed(2) + "%";
-}
-
-function clearBoardSelection() {
-  selectedRect = null;
-  currentSelection = null;
-  $("selectionInfo").textContent =
-    "Belum ada area dipilih. Tarik pada papan iklan.";
-  $("saveButton").textContent = editingId ? "Simpan perubahan" : "＋ Simpan iklan";
-  renderBoard();
-}
-
-function renderBoard() {
-  const board = $("board");
-  board.querySelectorAll(".ad-box, .selection").forEach(el => el.remove());
-
-  for (const ad of ads) {
-    const box = document.createElement("div");
-    box.className = "ad-box";
-    box.style.left = ad.rect.x / BOARD_SIZE * 100 + "%";
-    box.style.top = ad.rect.y / BOARD_SIZE * 100 + "%";
-    box.style.width = ad.rect.w / BOARD_SIZE * 100 + "%";
-    box.style.height = ad.rect.h / BOARD_SIZE * 100 + "%";
-    box.title = ad.name;
-
-    const img = document.createElement("img");
-    img.src = makeImageUrl(ad.image);
-    img.alt = ad.name;
-    box.appendChild(img);
-
-    const name = document.createElement("span");
-    name.textContent = ad.name;
-    box.appendChild(name);
-
-    box.addEventListener("pointerdown", event => event.stopPropagation());
-    box.addEventListener("click", event => {
-      event.stopPropagation();
-      window.open(ad.url, "_blank", "noopener,noreferrer");
-    });
-
+function drawBoard(){
+  const board=$("board");
+  board.querySelectorAll(".ad-box,.selection").forEach(e=>e.remove());
+  ads.forEach(ad=>{
+    const box=document.createElement("div");box.className="ad-box";
+    box.style.left=ad.rect.x/SIZE*100+"%";box.style.top=ad.rect.y/SIZE*100+"%";
+    box.style.width=ad.rect.w/SIZE*100+"%";box.style.height=ad.rect.h/SIZE*100+"%";
+    const img=document.createElement("img");img.src=urlFor(ad.image);img.alt=ad.name;box.appendChild(img);
+    const label=document.createElement("span");label.textContent=ad.name;box.appendChild(label);
     board.appendChild(box);
-  }
-
-  if (currentSelection) {
-    const s = document.createElement("div");
-    s.className = "selection";
-    s.style.left = currentSelection.x / BOARD_SIZE * 100 + "%";
-    s.style.top = currentSelection.y / BOARD_SIZE * 100 + "%";
-    s.style.width = currentSelection.w / BOARD_SIZE * 100 + "%";
-    s.style.height = currentSelection.h / BOARD_SIZE * 100 + "%";
-    board.appendChild(s);
+  });
+  if(selection){
+    const el=document.createElement("div");el.className="selection";
+    el.style.left=selection.x/SIZE*100+"%";el.style.top=selection.y/SIZE*100+"%";
+    el.style.width=selection.w/SIZE*100+"%";el.style.height=selection.h/SIZE*100+"%";
+    board.appendChild(el);
   }
 }
-
-function renderAds() {
-  clearImageUrls();
-  renderBoard();
-  updateStats();
-
-  const list = $("adList");
-  list.replaceChildren();
-
-  if (ads.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "empty";
-    empty.textContent = "Belum ada iklan. Buat iklan pertamamu di atas!";
-    list.appendChild(empty);
-    return;
-  }
-
-  for (const ad of ads) {
-    const card = document.createElement("article");
-    card.className = "ad-card";
-
-    const img = document.createElement("img");
-    img.src = makeImageUrl(ad.image);
-    img.alt = ad.name;
-    card.appendChild(img);
-
-    const content = document.createElement("div");
-    content.className = "ad-content";
-
-    const title = document.createElement("h3");
-    title.textContent = ad.name;
-    content.appendChild(title);
-
-    const url = document.createElement("div");
-    url.className = "ad-url";
-    url.textContent = ad.url;
-    content.appendChild(url);
-
-    const size = document.createElement("div");
-    size.className = "help";
-    size.textContent =
-      "Posisi: " + ad.rect.x + ", " + ad.rect.y +
-      " · Ukuran: " + ad.rect.w + " × " + ad.rect.h;
-    content.appendChild(size);
-
-    const buttons = document.createElement("div");
-    buttons.className = "row-buttons";
-
-    const edit = document.createElement("button");
-    edit.className = "btn btn-secondary";
-    edit.textContent = "Edit";
-    edit.addEventListener("click", () => startEdit(ad.id));
-    buttons.appendChild(edit);
-
-    const open = document.createElement("button");
-    open.className = "btn btn-secondary";
-    open.textContent = "Buka tautan";
-    open.addEventListener("click", () => {
-      window.open(ad.url, "_blank", "noopener,noreferrer");
-    });
-    buttons.appendChild(open);
-
-    const del = document.createElement("button");
-    del.className = "btn btn-danger";
-    del.textContent = "Hapus";
-    del.addEventListener("click", () => removeAd(ad.id));
-    buttons.appendChild(del);
-
-    content.appendChild(buttons);
-    card.appendChild(content);
-    list.appendChild(card);
-  }
+function render(){
+  clearRenderUrls();stats();drawBoard();
+  const list=$("adList");list.replaceChildren();
+  const query=$("search").value.trim().toLowerCase();
+  const filter=$("filterStatus").value;
+  const shown=ads.filter(a=>(a.name.toLowerCase().includes(query)||a.url.toLowerCase().includes(query))&&(filter==="all"||a.status===filter));
+  $("resultCount").textContent=shown.length+" iklan";
+  if(!shown.length){const e=document.createElement("div");e.className="empty";e.textContent=ads.length?"Tidak ada iklan yang cocok.":"Belum ada iklan. Buat iklan pertamamu!";list.appendChild(e);return;}
+  shown.forEach(ad=>{
+    const card=document.createElement("article");card.className="card";
+    const img=document.createElement("img");img.src=urlFor(ad.image);img.alt=ad.name;card.appendChild(img);
+    const content=document.createElement("div");content.className="card-content";
+    const badge=document.createElement("div");badge.className="badge"+(ad.status==="draft"?" draft":"");badge.textContent=ad.status==="active"?"Aktif":"Draf";content.appendChild(badge);
+    const title=document.createElement("h3");title.textContent=ad.name;content.appendChild(title);
+    const url=document.createElement("div");url.className="url";url.textContent=ad.url;content.appendChild(url);
+    const info=document.createElement("div");info.className="help";info.textContent="Area "+ad.rect.w+" × "+ad.rect.h+" · Posisi "+ad.rect.x+", "+ad.rect.y;content.appendChild(info);
+    const row=document.createElement("div");row.className="row";
+    const edit=document.createElement("button");edit.className="btn";edit.textContent="Edit";edit.onclick=()=>startEdit(ad.id);row.appendChild(edit);
+    const status=document.createElement("button");status.className="btn";status.textContent=ad.status==="active"?"Jadikan draf":"Aktifkan";
+    status.onclick=async()=>{ad.status=ad.status==="active"?"draft":"active";try{await putAd(ad);render();message("Status iklan diperbarui.");}catch(e){message("Gagal memperbarui status.");}};row.appendChild(status);
+    const open=document.createElement("button");open.className="btn";open.textContent="Buka tautan";open.onclick=()=>window.open(ad.url,"_blank","noopener,noreferrer");row.appendChild(open);
+    const del=document.createElement("button");del.className="btn danger";del.textContent="Hapus";del.onclick=()=>removeAd(ad.id);row.appendChild(del);
+    content.appendChild(row);card.appendChild(content);list.appendChild(card);
+  });
 }
-
-function getBoardPoint(event) {
-  const rect = $("board").getBoundingClientRect();
-  const x = Math.max(0, Math.min(BOARD_SIZE,
-    (event.clientX - rect.left) / rect.width * BOARD_SIZE));
-  const y = Math.max(0, Math.min(BOARD_SIZE,
-    (event.clientY - rect.top) / rect.height * BOARD_SIZE));
-  return { x, y };
+function point(e){
+  const r=$("board").getBoundingClientRect();
+  return {x:Math.max(0,Math.min(SIZE,(e.clientX-r.left)/r.width*SIZE)),y:Math.max(0,Math.min(SIZE,(e.clientY-r.top)/r.height*SIZE))};
 }
-
-function rectangleFromPoints(a, b) {
-  const x = Math.min(a.x, b.x);
-  const y = Math.min(a.y, b.y);
-  return {
-    x: Math.round(x),
-    y: Math.round(y),
-    w: Math.round(Math.abs(b.x - a.x)),
-    h: Math.round(Math.abs(b.y - a.y))
-  };
+function rectFrom(a,b){return{x:Math.round(Math.min(a.x,b.x)),y:Math.round(Math.min(a.y,b.y)),w:Math.round(Math.abs(a.x-b.x)),h:Math.round(Math.abs(a.y-b.y))};}
+function clearSelection(){
+  drag=null;selection=null;selectedRect=null;
+  $("selectionInfo").textContent="Belum ada area dipilih. Tarik pada papan.";
+  drawBoard();
 }
+const board=$("board");
 
-const board = $("board");
-
-board.addEventListener("pointerdown", event => {
-  if (event.target.closest(".ad-box")) return;
-  dragStart = getBoardPoint(event);
-  currentSelection = { x: dragStart.x, y: dragStart.y, w: 0, h: 0 };
-  board.setPointerCapture(event.pointerId);
-  renderBoard();
+/* Touch fix: capture pointer pada window, bukan elemen seleksi yang terus dirender ulang. */
+board.addEventListener("pointerdown",e=>{
+  if(e.button!==undefined&&e.button!==0)return;
+  e.preventDefault();
+  drag={id:e.pointerId,start:point(e),last:point(e)};
+  selection={...drag.start,w:0,h:0};
+  $("selectionInfo").textContent="Sedang memilih area...";
+  drawBoard();
 });
-
-board.addEventListener("pointermove", event => {
-  if (!dragStart) return;
-  currentSelection = rectangleFromPoints(dragStart, getBoardPoint(event));
-  $("selectionInfo").textContent =
-    "Area: " + currentSelection.w + " × " + currentSelection.h +
-    " unit · Posisi: " + currentSelection.x + ", " + currentSelection.y;
-  renderBoard();
-});
-
-board.addEventListener("pointerup", event => {
-  if (!dragStart) return;
-  const rect = rectangleFromPoints(dragStart, getBoardPoint(event));
-  dragStart = null;
-
-  if (rect.w < 100 || rect.h < 100) {
-    currentSelection = null;
-    selectedRect = null;
-    $("selectionInfo").textContent =
-      "Area terlalu kecil. Tarik untuk memilih area yang lebih besar.";
-    renderBoard();
-    return;
+window.addEventListener("pointermove",e=>{
+  if(!drag||e.pointerId!==drag.id)return;
+  e.preventDefault();
+  drag.last=point(e);
+  selection=rectFrom(drag.start,drag.last);
+  $("selectionInfo").textContent="Area "+selection.w+" × "+selection.h+
+    " unit · Posisi "+selection.x+", "+selection.y;
+  drawBoard();
+},{passive:false});
+function finishDrag(e){
+  if(!drag||e.pointerId!==drag.id)return;
+  const r=rectFrom(drag.start,point(e));drag=null;
+  if(r.w<100||r.h<100){
+    selection=null;selectedRect=null;
+    $("selectionInfo").textContent="Area terlalu kecil. Tarik jari lebih jauh.";
+  }else{
+    selection=r;selectedRect=r;
+    $("selectionInfo").textContent="Area dipilih: "+r.w+" × "+r.h+
+      " unit · Posisi "+r.x+", "+r.y;
   }
-
-  selectedRect = rect;
-  currentSelection = rect;
-  $("selectionInfo").textContent =
-    "Area dipilih: " + rect.w + " × " + rect.h +
-    " unit · Posisi: " + rect.x + ", " + rect.y;
-  renderBoard();
+  drawBoard();
+}
+window.addEventListener("pointerup",finishDrag);
+window.addEventListener("pointercancel",e=>{
+  if(drag&&e.pointerId===drag.id){drag=null;selection=null;drawBoard();}
 });
+$("clearSelection").onclick=clearSelection;
 
-board.addEventListener("pointercancel", () => {
-  dragStart = null;
-  currentSelection = null;
-  renderBoard();
-});
-
-$("galleryButton").addEventListener("click", () => {
-  $("fileInput").click();
-});
-
-$("fileInput").addEventListener("change", () => {
-  const file = $("fileInput").files[0];
-  if (!file) return;
-
-  if (!file.type.startsWith("image/")) {
-    showMessage("Pilih file gambar yang valid.");
-    $("fileInput").value = "";
-    return;
-  }
-
-  if (file.size > MAX_IMAGE_SIZE) {
-    showMessage("Ukuran gambar maksimal 5 MB.");
-    $("fileInput").value = "";
-    return;
-  }
-
-  const reader = new FileReader();
-
-  reader.onload = () => {
-    const img = new Image();
-
-    img.onload = () => {
-      selectedImage = file;
-      $("previewImage").src = reader.result;
-      $("previewName").textContent =
-        file.name + " · " + img.naturalWidth + " × " + img.naturalHeight;
-      $("previewWrap").style.display = "block";
+$("galleryButton").onclick=()=>$("fileInput").click();
+$("fileInput").onchange=()=>{
+  const file=$("fileInput").files[0];if(!file)return;
+  if(!file.type.startsWith("image/")){message("Pilih file gambar yang valid.");return;}
+  if(file.size>MAX){message("Ukuran gambar maksimal 5 MB.");$("fileInput").value="";return;}
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      selectedImage=file;
+      if(previewUrl)URL.revokeObjectURL(previewUrl);
+      previewUrl=URL.createObjectURL(file);
+      $("preview").src=previewUrl;
+      $("previewName").textContent=file.name+" · "+img.naturalWidth+" × "+img.naturalHeight;
+      $("previewWrap").style.display="block";
     };
-
-    img.onerror = () => showMessage("Gambar tidak dapat dibuka.");
-    img.src = reader.result;
+    img.onerror=()=>message("Gambar tidak dapat dibuka.");
+    img.src=reader.result;
   };
-
-  reader.onerror = () => showMessage("Gagal membaca gambar.");
+  reader.onerror=()=>message("Gagal membaca gambar.");
   reader.readAsDataURL(file);
-});
-
-$("removeImage").addEventListener("click", () => {
-  selectedImage = null;
-  $("fileInput").value = "";
-  $("previewImage").removeAttribute("src");
-  $("previewWrap").style.display = "none";
-});
-
-function resetForm() {
-  editingId = null;
-  selectedImage = null;
-  $("adName").value = "";
-  $("adUrl").value = "";
-  $("fileInput").value = "";
-  $("previewImage").removeAttribute("src");
-  $("previewWrap").style.display = "none";
-  $("saveButton").textContent = "＋ Simpan iklan";
-  clearBoardSelection();
+};
+$("removeImage").onclick=()=>{
+  selectedImage=null;$("fileInput").value="";
+  if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null;}
+  $("preview").removeAttribute("src");$("previewWrap").style.display="none";
+};
+function resetForm(){
+  editingId=null;selectedImage=null;
+  $("adName").value="";$("adUrl").value="";$("fileInput").value="";
+  $("adStatus").value="active";$("formTitle").textContent="🎨 Editor iklan";
+  $("saveButton").textContent="＋ Simpan iklan";
+  if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null;}
+  $("preview").removeAttribute("src");$("previewWrap").style.display="none";
+  clearSelection();
 }
-
-$("resetButton").addEventListener("click", resetForm);
-$("clearSelection").addEventListener("click", cle
+$("resetButton").onclick=resetForm;
+function startEdit(id){
+  const ad=ads.find(a=>a.id===id);if(!ad)return;
+  editingId=id;selectedRect={...ad.rect};selection={...ad.rect};selectedImage=null;
+  $("adName").value=ad.name;$("adUrl").value=ad.url;$("adStatus").value=ad.status;
+  $("formTitle").textContent="✏️ Edit iklan";
+  $("saveButton").textContent="Simpan perubahan";
+  if(previewUrl)URL.revokeObjectURL(previewUrl);
+  previewUrl=URL.createObjectURL(ad.image);$("preview").src=previewUrl;
+  $("previewName").textContent="Gambar tersimpan. Pilih gambar baru untuk menggantinya.";
+  $("previewWrap").style.display="block";
+  $("selectionInfo").textContent="Area iklan yang diedit: "+ad.rect.w+" × "+ad.rect.h;
+  drawBoard();showSection("editor");
+}
+async function removeAd(id){
+  if(!confirm("Hapus iklan ini?"))return;
+  try{await deleteAdDB(id);ads=ads.filter(a=>a.id!==id);if(editingId===id)resetForm();render();message("Iklan dihapus.");}
+  catch(e){message("Gagal menghapus iklan.");}
+}
+$("saveButton").onclick=async()=>{
+  const name=$("adName").value.trim(),rawUrl=$("adUrl").value.trim();
+  if(!name)return message("Isi nama iklan.");
+  let parsed;
+  try{parsed=new URL(rawUrl);if(!["https:","http:"].includes(parsed.protocol))throw 0;}
+  catch(e){return message("Tautan harus diawali https:// atau http://");}
+  if(!selectedRect)return message("Tarik pada papan untuk memilih area iklan.");
+  const old=editingId?ads.find(a=>a.id===editingId):null;
+  const image=selectedImage||(old&&old.image);
+  if(!image)return message("Pilih gambar dari galeri.");
+  if(ads.some(a=>a.id!==editingId&&overlaps(selectedRect,a.rect)))
+    return message("Area bertumpuk dengan iklan lain. Pilih area kosong.");
+  const ad={
+    id:editingId||(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)),
+    name,url:parsed.href,image,rect:{...selectedRect},status:$("adStatus").value,updatedAt:Date.now()
+  };
+  try{
+    await putAd(ad);
+    const i=ads.findIndex(a=>a.id===ad.id);if(i>=0)ads[i]=ad;else ads.push(ad);
+    render();resetForm();message("Iklan t
