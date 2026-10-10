@@ -3,189 +3,147 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pixel Market v3.3 - Smart Board</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pixel Market v3.3</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
-  padding: 16px;
+  padding: 14px;
   background: #10141d;
   color: #f1f5f9;
   font-family: Arial, sans-serif;
 }
 
-header {
-  text-align: center;
-  margin-bottom: 22px;
-}
-
-header h1 {
-  margin-bottom: 6px;
-  color: #67e8f9;
-}
-
-header p {
-  color: #aab6c8;
-  font-size: 14px;
-}
+header { text-align: center; margin-bottom: 22px; }
+h1 { color: #67e8f9; }
+h2 { font-size: 19px; }
 
 .panel {
-  max-width: 900px;
+  max-width: 850px;
   margin: 0 auto 18px;
   padding: 16px;
-  border: 1px solid #303b4d;
-  border-radius: 12px;
   background: #1a2230;
+  border: 1px solid #344156;
+  border-radius: 12px;
 }
 
 .stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .stat {
+  min-width: 0;
   padding: 12px 5px;
   text-align: center;
   background: #263448;
-  border-radius: 9px;
+  border-radius: 8px;
 }
 
+.stat span { font-size: 12px; color: #cbd5e1; }
 .stat strong {
   display: block;
-  margin-top: 7px;
-  font-size: 20px;
+  margin-top: 8px;
+  font-size: 17px;
   overflow-wrap: anywhere;
 }
 
-.stat span {
-  color: #bdc9da;
-  font-size: 12px;
-}
-
 .progress {
-  height: 12px;
-  margin-top: 15px;
-  overflow: hidden;
-  border-radius: 10px;
+  height: 10px;
+  margin-top: 14px;
   background: #384458;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 #progressBar {
   height: 100%;
-  width: 0%;
+  width: 0;
   background: #22d3ee;
-  transition: width 0.2s;
-}
-
-.board-wrap {
-  width: 100%;
-  max-width: 900px;
-  margin: auto;
-}
-
-.board-heading {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 10px;
 }
 
 #board {
   position: relative;
   width: 100%;
-  aspect-ratio: 5 / 3;
+  max-width: 850px;
+  aspect-ratio: 1 / 1;
+  margin: auto;
   overflow: hidden;
   border: 2px solid #67e8f9;
-  border-radius: 5px;
   background-color: #202b3b;
   background-image:
     linear-gradient(#ffffff12 1px, transparent 1px),
     linear-gradient(90deg, #ffffff12 1px, transparent 1px);
-  background-size: 1% 1.6666667%;
+  background-size: 1% 1%;
   touch-action: none;
   user-select: none;
 }
 
-#adLayer,
-#selectionLayer {
+#adLayer, #selectionLayer {
   position: absolute;
   inset: 0;
 }
 
-#adLayer {
-  pointer-events: none;
-}
+#adLayer { pointer-events: none; }
 
 .ad-image {
   position: absolute;
   object-fit: fill;
-  border: 1px solid #ffffff;
+  border: 1px solid white;
   background: #334155;
 }
 
 #selection {
-  display: none;
   position: absolute;
+  display: none;
   border: 2px dashed #facc15;
   background: #facc152b;
   pointer-events: none;
 }
 
-.hint {
-  color: #b7c4d6;
+.hint, .notice {
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.6;
+  color: #c1cede;
 }
 
-label {
-  display: block;
-  margin: 13px 0 6px;
-  font-size: 14px;
-}
+label { display: block; margin: 13px 0 6px; }
 
 input {
+  display: block;
   width: 100%;
   padding: 12px;
+  color: white;
+  background: #101827;
   border: 1px solid #46546b;
   border-radius: 7px;
-  background: #101827;
-  color: white;
   font-size: 15px;
 }
 
 button {
   padding: 11px 14px;
+  color: white;
+  background: #0891b2;
   border: 0;
   border-radius: 7px;
-  background: #0891b2;
-  color: white;
   font-weight: bold;
   cursor: pointer;
 }
 
-button:active {
-  opacity: 0.8;
-}
+button:disabled { opacity: .45; cursor: not-allowed; }
+.primary { width: 100%; margin-top: 15px; }
+.secondary { background: #475569; }
+.danger { background: #b91c1c; }
 
-button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.primary {
-  width: 100%;
-  margin-top: 15px;
-}
-
-.secondary {
-  background: #38465b;
+.notice {
+  padding: 10px;
+  background: #101827;
+  border-radius: 7px;
+  overflow-wrap: anywhere;
 }
 
 .ad-card {
@@ -196,203 +154,136 @@ button:disabled {
   overflow-wrap: anywhere;
 }
 
-.ad-card h3 {
-  margin: 0 0 8px;
-}
+.ad-card p { font-size: 13px; line-height: 1.5; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+footer { text-align: center; padding: 20px; color: #94a3b8; }
 
-.ad-card p {
-  font-size: 13px;
-  color: #c1cede;
-  line-height: 1.5;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.notice {
-  margin-top: 12px;
-  padding: 10px;
-  border-radius: 7px;
-  background: #101827;
-  color: #cbd5e1;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-footer {
-  padding: 20px 0;
-  text-align: center;
-  color: #93a4bb;
-  font-size: 12px;
-}
-
-@media (max-width: 480px) {
-  body {
-    padding: 10px;
-  }
-
-  .panel {
-    padding: 12px;
-  }
-
-  .stat strong {
-    font-size: 17px;
-  }
+@media (max-width: 420px) {
+  body { padding: 8px; }
+  .panel { padding: 12px; }
+  .stat strong { font-size: 14px; }
 }
 </style>
 </head>
 
 <body>
-
 <header>
   <h1>Pixel Market</h1>
-  <p>Version 3.3 — Smart Board</p>
+  <p>Version 3.3 — Smart Board Fixed</p>
 </header>
 
 <section class="panel">
-  <h2>Smart Board Statistics</h2>
-
+  <h2>Statistik Smart Board</h2>
   <div class="stats">
     <div class="stat">
-      <span>Area Terpakai</span>
+      <span>Terpakai</span>
       <strong id="used">0</strong>
     </div>
-
     <div class="stat">
-      <span>Area Kosong</span>
-      <strong id="free">6000</strong>
+      <span>Area kosong</span>
+      <strong id="free">100.000.000</strong>
     </div>
-
     <div class="stat">
       <span>Pemakaian</span>
       <strong id="percent">0%</strong>
     </div>
   </div>
-
   <div class="progress">
     <div id="progressBar"></div>
   </div>
-
   <p class="hint">
-    Ukuran papan: 100 × 60 unit = 6.000 unit.
-    Satu unit mewakili satu sel pada papan.
+    Papan 10.000 × 10.000 unit. Satu sel visual mewakili
+    100 × 100 unit. Area yang dipilih tetap bisa berukuran
+    lebih kecil dari satu sel.
   </p>
 </section>
 
-<section class="board-wrap">
-  <div class="board-heading">
-    <strong>Papan Iklan</strong>
-    <span id="count">0 iklan</span>
-  </div>
-
+<section class="panel">
+  <h2>Papan Iklan</h2>
+  <p class="hint">
+    Sentuh papan, geser untuk memilih persegi panjang,
+    kemudian lepaskan.
+  </p>
   <div id="board">
     <div id="adLayer"></div>
     <div id="selectionLayer">
       <div id="selection"></div>
     </div>
   </div>
-
-  <p class="hint">
-    Sentuh atau tekan papan, lalu geser untuk memilih
-    area persegi panjang. Lepaskan untuk menyelesaikan
-    pemilihan area.
+  <p id="selectionInfo" class="notice">
+    Belum ada area yang dipilih.
   </p>
+  <p id="count" class="hint">0 iklan</p>
 </section>
 
 <section class="panel">
   <h2>Pasang Iklan</h2>
-
-  <p id="selectionInfo" class="notice">
-    Belum ada area yang dipilih.
-  </p>
-
   <form id="adForm">
     <label for="adName">Nama iklan</label>
     <input id="adName" maxlength="80"
-      placeholder="Contoh: Toko Pixel"
-      required>
+      placeholder="Nama iklan" required>
 
-    <label for="imageUrl">URL gambar iklan</label>
+    <label for="imageUrl">URL gambar</label>
     <input id="imageUrl" type="url"
-      placeholder="https://contoh.com/gambar.jpg"
-      required>
+      placeholder="https://contoh.com/gambar.jpg" required>
 
-    <label for="websiteUrl">URL website iklan</label>
+    <label for="websiteUrl">URL website tujuan</label>
     <input id="websiteUrl" type="url"
-      placeholder="https://contoh.com"
-      required>
+      placeholder="https://contoh.com" required>
 
-    <button class="primary" type="submit">
+    <button id="submitAd" class="primary" type="submit">
       Pasang Iklan
     </button>
   </form>
-
   <p class="hint">
-    Gunakan URL gambar dan website yang kamu percaya.
-    Gambar harus dapat diakses melalui browser.
+    Gunakan alamat HTTPS dari sumber yang tepercaya.
+    Iklan dalam versi ini belum disimpan permanen.
   </p>
 </section>
 
 <section class="panel">
   <h2>Daftar Iklan</h2>
-  <div id="adList">
-    <p class="hint">Belum ada iklan yang dipasang.</p>
-  </div>
-
-  <div class="notice">
-    Data versi ini hanya tersimpan selama halaman
-    masih berjalan. Memuat ulang halaman akan
-    menghapus iklan dan pilihan area.
-  </div>
+  <div id="adList"></div>
 </section>
 
-<footer>
-  Pixel Market v3.3 Smart Board
-</footer>
+<footer>Pixel Market v3.3 Smart Board</footer>
 
 <script>
-const COLS = 100;
-const ROWS = 60;
-const TOTAL = COLS * ROWS;
+"use strict";
+
+const SIZE = 10000;
+const TOTAL = SIZE * SIZE;
 
 const board = document.getElementById("board");
 const selection = document.getElementById("selection");
-const selectionLayer = document.getElementById("selectionLayer");
 const adLayer = document.getElementById("adLayer");
 const adList = document.getElementById("adList");
-const adForm = document.getElementById("adForm");
+const form = document.getElementById("adForm");
+const submitAd = document.getElementById("submitAd");
+const selectionInfo = document.getElementById("selectionInfo");
 
 let ads = [];
 let selected = null;
 let dragging = false;
 let start = null;
-let pointerId = null;
+let activePointer = null;
 
-function getCell(event) {
+function getPoint(event) {
   const rect = board.getBoundingClientRect();
 
-  const x = Math.floor(
-    (event.clientX - rect.left) / rect.width * COLS
-  );
-
-  const y = Math.floor(
-    (event.clientY - rect.top) / rect.height * ROWS
-  );
-
   return {
-    x: Math.max(0, Math.min(COLS - 1, x)),
-    y: Math.max(0, Math.min(ROWS - 1, y))
+    x: Math.max(0, Math.min(SIZE,
+      (event.clientX - rect.left) / rect.width * SIZE)),
+    y: Math.max(0, Math.min(SIZE,
+      (event.clientY - rect.top) / rect.height * SIZE))
   };
 }
 
-function rectangle(a, b) {
+function makeRect(a, b) {
   const x = Math.min(a.x, b.x);
   const y = Math.min(a.y, b.y);
-  const right = Math.max(a.x, b.x) + 1;
-  const bottom = Math.max(a.y, b.y) + 1;
+  const right = Math.max(a.x, b.x);
+  const bottom = Math.max(a.y, b.y);
 
   return {
     x, y,
@@ -401,91 +292,96 @@ function rectangle(a, b) {
   };
 }
 
-function showRectangle(element, r) {
-  element.style.left = (r.x / COLS * 100) + "%";
-  element.style.top = (r.y / ROWS * 100) + "%";
-  element.style.width = (r.w / COLS * 100) + "%";
-  element.style.height = (r.h / ROWS * 100) + "%";
-}
-
 function area(r) {
   return r.w * r.h;
 }
 
 function overlaps(a, b) {
   return a.x < b.x + b.w &&
-         a.x + a.w > b.x &&
-         a.y < b.y + b.h &&
-         a.y + a.h > b.y;
+    a.x + a.w > b.x &&
+    a.y < b.y + b.h &&
+    a.y + a.h > b.y;
 }
 
-function isAvailable(r) {
-  return !ads.some(ad => overlaps(r, ad));
+function available(r) {
+  return r.w > 0 && r.h > 0 &&
+    !ads.some(ad => overlaps(r, ad));
+}
+
+function formatNumber(n) {
+  return Math.round(n).toLocaleString("id-ID");
+}
+
+function showRect(element, r) {
+  element.style.left = (r.x / SIZE * 100) + "%";
+  element.style.top = (r.y / SIZE * 100) + "%";
+  element.style.width = (r.w / SIZE * 100) + "%";
+  element.style.height = (r.h / SIZE * 100) + "%";
 }
 
 function updateSelection(r) {
   selected = r;
-  showRectangle(selection, r);
+  showRect(selection, r);
   selection.style.display = "block";
 
-  document.getElementById("selectionInfo").textContent =
-    `Posisi: (${r.x}, ${r.y}) · Ukuran: ${r.w} × ${r.h} · ` +
-    `Luas: ${area(r)} unit · ` +
-    (isAvailable(r)
-      ? "Area tersedia."
-      : "Area bertabrakan dengan iklan lain.");
+  const ok = available(r);
 
-  adForm.querySelector("button[type=submit]").disabled =
-    !isAvailable(r);
+  selectionInfo.textContent =
+    `Posisi (${formatNumber(r.x)}, ${formatNumber(r.y)}) · ` +
+    `Ukuran ${formatNumber(r.w)} × ${formatNumber(r.h)} · ` +
+    `Luas ${formatNumber(area(r))} unit² · ` +
+    (ok ? "Area tersedia." : "Area tidak tersedia atau terlalu kecil.");
+
+  submitAd.disabled = !ok;
 }
 
 board.addEventListener("pointerdown", event => {
-  if (event.button !== 0 && event.pointerType === "mouse") {
-    return;
-  }
+  if (event.button !== 0 && event.pointerType === "mouse") return;
 
   event.preventDefault();
-
   dragging = true;
-  pointerId = event.pointerId;
-  start = getCell(event);
+  activePointer = event.pointerId;
+  start = getPoint(event);
 
-  board.setPointerCapture(pointerId);
-  updateSelection(rectangle(start, start));
+  board.setPointerCapture(event.pointerId);
+  updateSelection(makeRect(start, start));
 });
 
 board.addEventListener("pointermove", event => {
-  if (!dragging || event.pointerId !== pointerId) return;
-
+  if (!dragging || event.pointerId !== activePointer) return;
   event.preventDefault();
-  updateSelection(rectangle(start, getCell(event)));
+  updateSelection(makeRect(start, getPoint(event)));
 });
 
-function finishSelection(event) {
-  if (!dragging || event.pointerId !== pointerId) return;
+function finish(event) {
+  if (!dragging || event.pointerId !== activePointer) return;
 
   if (event.type === "pointerup") {
-    updateSelection(rectangle(start, getCell(event)));
+    updateSelection(makeRect(start, getPoint(event)));
   }
 
   dragging = false;
   start = null;
-  pointerId = null;
+  activePointer = null;
 }
 
-board.addEventListener("pointerup", finishSelection);
-board.addEventListener("pointercancel", finishSelection);
+board.addEventListener("pointerup", finish);
+board.addEventListener("pointercancel", finish);
 
-adForm.addEventListener("submit", event => {
+function validWebUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+form.addEventListener("submit", event => {
   event.preventDefault();
 
-  if (!selected) {
-    alert("Pilih area pada papan terlebih dahulu.");
-    return;
-  }
-
-  if (!isAvailable(selected)) {
-    alert("Area bertabrakan dengan iklan lain.");
+  if (!selected || !available(selected)) {
+    alert("Pilih area kosong yang valid terlebih dahulu.");
     return;
   }
 
@@ -493,21 +389,15 @@ adForm.addEventListener("submit", event => {
   const imageUrl = document.getElementById("imageUrl").value.trim();
   const websiteUrl = document.getElementById("websiteUrl").value.trim();
 
-  try {
-    const image = new URL(imageUrl);
-    const website = new URL(websiteUrl);
-
-    if (!["https:", "http:"].includes(image.protocol) ||
-        !["https:", "http:"].includes(website.protocol)) {
-      throw new Error("URL tidak didukung");
-    }
-  } catch {
-    alert("Masukkan URL gambar dan website yang valid.");
+  if (!name || !validWebUrl(imageUrl) || !validWebUrl(websiteUrl)) {
+    alert("Periksa nama, URL gambar, dan URL website.");
     return;
   }
 
   ads.push({
-    id: Date.now() + Math.random(),
+    id: crypto.randomUUID
+      ? crypto.randomUUID()
+      : String(Date.now()) + Math.random(),
     name,
     imageUrl,
     websiteUrl,
@@ -516,11 +406,9 @@ adForm.addEventListener("submit", event => {
 
   selected = null;
   selection.style.display = "none";
+  selectionInfo.textContent = "Iklan berhasil dipasang. Pilih area berikutnya.";
+  form.reset();
 
-  document.getElementById("selectionInfo").textContent =
-    "Iklan berhasil dipasang. Pilih area baru untuk iklan berikutnya.";
-
-  adForm.reset();
   render();
 });
 
@@ -539,7 +427,7 @@ function render() {
     img.alt = ad.name;
     img.draggable = false;
     img.referrerPolicy = "no-referrer";
-    showRectangle(img, ad);
+    showRect(img, ad);
     adLayer.appendChild(img);
 
     img.addEventListener("error", () => {
@@ -552,65 +440,59 @@ function render() {
     const title = document.createElement("h3");
     title.textContent = `${index + 1}. ${ad.name}`;
 
-    const details = document.createElement("p");
-    details.textContent =
-      `Posisi (${ad.x}, ${ad.y}) · ` +
-      `${ad.w} × ${ad.h} unit · ` +
-      `${area(ad)} unit terpakai`;
+    const detail = document.createElement("p");
+    detail.textContent =
+      `Posisi (${formatNumber(ad.x)}, ${formatNumber(ad.y)}) · ` +
+      `Ukuran ${formatNumber(ad.w)} × ${formatNumber(ad.h)} · ` +
+      `Luas ${formatNumber(area(ad))} unit²`;
 
-    const link = document.createElement("p");
-    link.textContent = "Website: " + ad.websiteUrl;
+    const website = document.createElement("p");
+    website.textContent = "Website: " + ad.websiteUrl;
 
     const actions = document.createElement("div");
     actions.className = "actions";
 
-    const openButton = document.createElement("button");
-    openButton.textContent = "Buka website iklan";
-    openButton.addEventListener("click", () => {
+    const open = document.createElement("button");
+    open.textContent = "Buka website";
+    open.addEventListener("click", () => {
       window.open(ad.websiteUrl, "_blank", "noopener,noreferrer");
     });
 
-    const removeButton = document.createElement("button");
-    removeButton.className = "secondary";
-    removeButton.textContent = "Hapus iklan";
-    removeButton.addEventListener("click", () => {
+    const remove = document.createElement("button");
+    remove.className = "danger";
+    remove.textContent = "Hapus iklan";
+    remove.addEventListener("click", () => {
       ads = ads.filter(item => item.id !== ad.id);
       render();
     });
 
-    actions.append(openButton, removeButton);
-    card.append(title, details, link, actions);
+    actions.append(open, remove);
+    card.append(title, detail, website, actions);
     adList.appendChild(card);
   });
 
-  const free = TOTAL - used;
+  const free = Math.max(0, TOTAL - used);
   const percent = used / TOTAL * 100;
 
-  document.getElementById("used").textContent = used.toLocaleString("id-ID");
-  document.getElementById("free").textContent = free.toLocaleString("id-ID");
-  document.getElementById("percent").textContent =
-    percent.toFixed(2) + "%";
+  document.getElementById("used").textContent = formatNumber(used);
+  document.getElementById("free").textContent = formatNumber(free);
+  document.getElementById("percent").textContent = percent.toFixed(4) + "%";
   document.getElementById("progressBar").style.width =
-    percent + "%";
-  document.getElementById("count").textContent =
-    ads.length + (ads.length === 1 ? " iklan" : " iklan");
+    Math.min(100, percent) + "%";
+  document.getElementById("count").textContent = ads.length + " iklan";
 
   if (ads.length === 0) {
     const empty = document.createElement("p");
     empty.className = "hint";
-    empty.textContent = "Belum ada iklan yang dipasang.";
+    empty.textContent = "Belum ada iklan.";
     adList.appendChild(empty);
   }
 
-  if (selected) {
-    updateSelection(selected);
-  } else {
-    adForm.querySelector("button[type=submit]").disabled = false;
-  }
+  if (selected) updateSelection(selected);
+  else submitAd.disabled = false;
 }
 
 render();
 </script>
-
 </body>
 </html>
