@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pixel Market</title>
+<title>Pixel Market 3.0</title>
 <style>
 * { box-sizing: border-box; }
 
@@ -11,93 +12,143 @@ body {
   margin: 0;
   padding: 16px;
   font-family: Arial, sans-serif;
-  background: #eeeeee;
-  color: #222222;
+  color: #172033;
+  background: #edf1f7;
 }
 
 h1 { margin: 0 0 8px; }
-
+h2 { font-size: 19px; }
 p { line-height: 1.5; }
 
 .panel {
   background: white;
-  padding: 14px;
-  border-radius: 10px;
-  margin-bottom: 14px;
+  padding: 15px;
+  margin: 14px 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0000000a;
 }
 
 #world {
   display: block;
   width: 100%;
   height: auto;
+  border: 2px solid #263247;
+  border-radius: 4px;
   background: white;
-  border: 2px solid #222222;
   touch-action: none;
 }
 
+label {
+  display: block;
+  margin: 12px 0 6px;
+  font-weight: bold;
+}
+
+input {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #bbc5d4;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
+}
+
 button {
-  padding: 11px 14px;
-  margin: 4px 4px 4px 0;
+  padding: 12px 15px;
+  margin: 8px 5px 0 0;
   border: 0;
-  border-radius: 7px;
+  border-radius: 8px;
   background: #1769e0;
   color: white;
   font-size: 15px;
+  font-weight: bold;
 }
 
-button.secondary {
-  background: #555555;
-}
-
-.info {
-  overflow-wrap: anywhere;
-}
+button.secondary { background: #4b5563; }
 
 #price {
-  font-size: 24px;
+  color: #087b43;
+  font-size: 25px;
   font-weight: bold;
-  color: #087b39;
 }
 
-.note {
-  font-size: 13px;
-  color: #666666;
+#message {
+  overflow-wrap: anywhere;
+  font-size: 14px;
 }
+
+.small {
+  color: #667085;
+  font-size: 13px;
+}
+
+#preview {
+  display: block;
+  max-width: 100%;
+  max-height: 180px;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+#preview[hidden] { display: none; }
+
+a { overflow-wrap: anywhere; }
 </style>
 </head>
 
 <body>
 
 <h1>Pixel Market</h1>
-<p>Pilih area untuk melihat perkiraan harga iklanmu.</p>
+<p>Tempat untuk memasang iklan berbasis piksel.</p>
 
 <div class="panel">
-  <strong>Ukuran kanvas:</strong> 10.000 × 10.000 unit
-  <br>
-  <strong>Ukuran satu kotak:</strong> 100 × 100 unit
-  <br>
+  <strong>Ukuran kanvas:</strong> 10.000 × 10.000 unit<br>
+  <strong>Ukuran satu kotak:</strong> 100 × 100 unit<br>
   <strong>Harga:</strong> Rp100 per kotak
 </div>
 
 <div class="panel">
+  <h2>1. Pilih area iklan</h2>
+  <p class="small">
+    Tarik jari pada grid untuk memilih persegi panjang.
+    Jika area sudah dipasangi iklan, ketuk gambarnya untuk
+    membuka tautan.
+  </p>
   <canvas id="world" width="1000" height="1000"></canvas>
+
+  <p id="status">Belum ada area yang dipilih.</p>
+  <p id="price">Harga: Rp0</p>
+
+  <button id="cancel" class="secondary">Batal pilihan</button>
 </div>
 
 <div class="panel">
-  <h3>Area iklan pilihan</h3>
-  <p id="status" class="info">
-    Belum ada area yang dipilih.
+  <h2>2. Buat iklan</h2>
+
+  <label for="imageFile">Gambar iklan dari galeri</label>
+  <input id="imageFile" type="file" accept="image/*">
+
+  <img id="preview" alt="Pratinjau gambar iklan" hidden>
+
+  <label for="website">Tautan website pengiklan</label>
+  <input
+    id="website"
+    type="url"
+    placeholder="https://contoh.com"
+    autocomplete="url"
+  >
+
+  <button id="publish">Tampilkan pratinjau iklan</button>
+
+  <p id="message" aria-live="polite">
+    Pilih area, gambar, dan tautan terlebih dahulu.
   </p>
 
-  <p id="price">Harga: Rp0</p>
-
-  <p class="note">
-    Harga ini masih simulasi. Belum ada pembayaran sungguhan
-    dan area belum dipesan secara permanen.
+  <p class="small">
+    Ini hanya pratinjau di perangkatmu. Belum ada pembayaran
+    atau penyimpanan iklan permanen.
   </p>
-
-  <button id="cancel">Batal pilihan</button>
-  <button id="reset" class="secondary">Reset kanvas</button>
 </div>
 
 <script>
@@ -107,6 +158,10 @@ const canvas = document.getElementById("world");
 const ctx = canvas.getContext("2d");
 const statusText = document.getElementById("status");
 const priceText = document.getElementById("price");
+const message = document.getElementById("message");
+const imageFile = document.getElementById("imageFile");
+const websiteInput = document.getElementById("website");
+const preview = document.getElementById("preview");
 
 const GRID = 10;
 const UNIT_PER_PIXEL = 10;
@@ -116,6 +171,9 @@ let start = null;
 let current = null;
 let dragging = false;
 let selection = null;
+let ad = null;
+let loadedImage = null;
+let imageUrl = null;
 
 function snap(value) {
   return Math.max(
@@ -131,14 +189,10 @@ function getPosition(event) {
   const rect = canvas.getBoundingClientRect();
 
   return {
-    x: snap(
-      (event.clientX - rect.left) *
-      canvas.width / rect.width
-    ),
-    y: snap(
-      (event.clientY - rect.top) *
-      canvas.height / rect.height
-    )
+    x: snap((event.clientX - rect.left) *
+      canvas.width / rect.width),
+    y: snap((event.clientY - rect.top) *
+      canvas.height / rect.height)
   };
 }
 
@@ -155,8 +209,25 @@ function getActiveArea() {
   if (dragging && start && current) {
     return makeArea(start, current);
   }
-
   return selection;
+}
+
+function drawImageCover(img, x, y, width, height) {
+  const scale = Math.max(
+    width / img.width,
+    height / img.height
+  );
+
+  const sourceWidth = width / scale;
+  const sourceHeight = height / scale;
+  const sourceX = (img.width - sourceWidth) / 2;
+  const sourceY = (img.height - sourceHeight) / 2;
+
+  ctx.drawImage(
+    img,
+    sourceX, sourceY, sourceWidth, sourceHeight,
+    x, y, width, height
+  );
 }
 
 function draw() {
@@ -164,11 +235,10 @@ function draw() {
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Menggambar grid tanpa membuat ribuan elemen HTML.
   for (let x = 0; x <= canvas.width; x += GRID) {
     ctx.beginPath();
     ctx.strokeStyle =
-      (x / GRID) % 5 === 0 ? "#999999" : "#d6d6d6";
+      (x / GRID) % 5 === 0 ? "#999999" : "#dedede";
     ctx.lineWidth = 1;
     ctx.moveTo(x + 0.5, 0);
     ctx.lineTo(x + 0.5, canvas.height);
@@ -178,17 +248,44 @@ function draw() {
   for (let y = 0; y <= canvas.height; y += GRID) {
     ctx.beginPath();
     ctx.strokeStyle =
-      (y / GRID) % 5 === 0 ? "#999999" : "#d6d6d6";
+      (y / GRID) % 5 === 0 ? "#999999" : "#dedede";
     ctx.lineWidth = 1;
     ctx.moveTo(0, y + 0.5);
     ctx.lineTo(canvas.width, y + 0.5);
     ctx.stroke();
   }
 
+  // Gambar iklan hanya muncul pada area yang dipilih.
+  if (ad && ad.area && ad.image) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(
+      ad.area.x, ad.area.y,
+      ad.area.width, ad.area.height
+    );
+    ctx.clip();
+
+    drawImageCover(
+      ad.image,
+      ad.area.x, ad.area.y,
+      ad.area.width, ad.area.height
+    );
+    ctx.restore();
+
+    ctx.strokeStyle = "#1769e0";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(
+      ad.area.x + 1,
+      ad.area.y + 1,
+      Math.max(0, ad.area.width - 2),
+      Math.max(0, ad.area.height - 2)
+    );
+  }
+
   const area = getActiveArea();
 
   if (area && area.width > 0 && area.height > 0) {
-    ctx.fillStyle = "rgba(23, 105, 224, 0.28)";
+    ctx.fillStyle = "rgba(23, 105, 224, 0.22)";
     ctx.fillRect(
       area.x, area.y, area.width, area.height
     );
@@ -207,11 +304,8 @@ function draw() {
 function updateStatus() {
   const area = getActiveArea();
 
-  if (!area || area.width === 0 || area.height === 0) {
-    statusText.textContent = dragging
-      ? "Tarik jari untuk memilih area."
-      : "Belum ada area yang dipilih.";
-
+  if (!area || !area.width || !area.height) {
+    statusText.textContent = "Belum ada area yang dipilih.";
     priceText.textContent = "Harga: Rp0";
     return;
   }
@@ -220,17 +314,16 @@ function updateStatus() {
   const y = area.y * UNIT_PER_PIXEL;
   const width = area.width * UNIT_PER_PIXEL;
   const height = area.height * UNIT_PER_PIXEL;
-
   const widthCells = area.width / GRID;
   const heightCells = area.height / GRID;
-  const totalCells = widthCells * heightCells;
-  const price = totalCells * PRICE_PER_CELL;
+  const cells = widthCells * heightCells;
+  const price = cells * PRICE_PER_CELL;
 
   statusText.textContent =
-    `Posisi: X ${x}, Y ${y} | ` +
+    `Posisi X: ${x}, Y: ${y} | ` +
     `Lebar: ${width} unit (${widthCells} kotak) | ` +
     `Tinggi: ${height} unit (${heightCells} kotak) | ` +
-    `Jumlah: ${totalCells} kotak`;
+    `Jumlah: ${cells} kotak`;
 
   priceText.textContent =
     "Harga: Rp" + price.toLocaleString("id-ID");
@@ -242,10 +335,21 @@ canvas.addEventListener("pointerdown", event => {
   }
 
   event.preventDefault();
-  canvas.setPointerCapture(event.pointerId);
+  const pos = getPosition(event);
 
-  start = getPosition(event);
-  current = start;
+  // Ketuk iklan yang sudah dipasang untuk membuka tautannya.
+  if (ad && !dragging &&
+      pos.x >= ad.area.x &&
+      pos.x <= ad.area.x + ad.area.width &&
+      pos.y >= ad.area.y &&
+      pos.y <= ad.area.y + ad.area.height) {
+    window.open(ad.url, "_blank", "noopener,noreferrer");
+    return;
+  }
+
+  canvas.setPointerCapture(event.pointerId);
+  start = pos;
+  current = pos;
   dragging = true;
   selection = null;
 
@@ -255,10 +359,9 @@ canvas.addEventListener("pointerdown", event => {
 
 canvas.addEventListener("pointermove", event => {
   if (!dragging) return;
-
   event.preventDefault();
-  current = getPosition(event);
 
+  current = getPosition(event);
   draw();
   updateStatus();
 });
@@ -287,21 +390,111 @@ function finishSelection(event) {
 canvas.addEventListener("pointerup", finishSelection);
 canvas.addEventListener("pointercancel", finishSelection);
 
-function clearSelection() {
+document.getElementById("cancel").addEventListener("click", () => {
   dragging = false;
   start = null;
   current = null;
   selection = null;
+  draw();
+  updateStatus();
+});
+
+imageFile.addEventListener("change", () => {
+  const file = imageFile.files[0];
+
+  loadedImage = null;
+
+  if (imageUrl) {
+    URL.revokeObjectURL(imageUrl);
+    imageUrl = null;
+  }
+
+  if (!file) {
+    preview.hidden = true;
+    return;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    message.textContent = "Pilih file gambar yang valid.";
+    imageFile.value = "";
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    message.textContent =
+      "Gambar terlalu besar. Pilih gambar maksimal 5 MB.";
+    imageFile.value = "";
+    preview.hidden = true;
+    return;
+  }
+
+  imageUrl = URL.createObjectURL(file);
+  const img = new Image();
+
+  img.onload = () => {
+    loadedImage = img;
+    preview.src = imageUrl;
+    preview.hidden = false;
+    message.textContent = "Gambar siap digunakan.";
+  };
+
+  img.onerror = () => {
+    loadedImage = null;
+    message.textContent = "Gambar tidak bisa dibaca.";
+  };
+
+  img.src = imageUrl;
+});
+
+document.getElementById("publish").addEventListener("click", () => {
+  if (!selection || !selection.width || !selection.height) {
+    message.textContent = "Pilih area pada grid terlebih dahulu.";
+    return;
+  }
+
+  if (!loadedImage) {
+    message.textContent = "Pilih gambar iklan terlebih dahulu.";
+    return;
+  }
+
+  let url;
+
+  try {
+    url = new URL(websiteInput.value.trim());
+  } catch {
+    message.textContent =
+      "Masukkan tautan lengkap, misalnya https://contoh.com";
+    return;
+  }
+
+  if (url.protocol !== "https:" && url.protocol !== "http:") {
+    message.textContent =
+      "Tautan harus menggunakan HTTP atau HTTPS.";
+    return;
+  }
+
+  if (ad) {
+    URL.revokeObjectURL(ad.imageUrl);
+  }
+
+  ad = {
+    area: { ...selection },
+    image: loadedImage,
+    imageUrl: imageUrl,
+    url: url.href
+  };
+
+  // Area dan gambar kini menjadi satu pratinjau iklan.
+  imageUrl = null;
+  selection = null;
 
   draw();
   updateStatus();
-}
 
-document.getElementById("cancel")
-  .addEventListener("click", clearSelection);
-
-document.getElementById("reset")
-  .addEventListener("click", clearSelection);
+  message.textContent =
+    "Pratinjau iklan terpasang. Ketuk gambarnya pada grid " +
+    "untuk mencoba membuka website pengiklan.";
+});
 
 draw();
 updateStatus();
