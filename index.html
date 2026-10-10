@@ -1,84 +1,224 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pixel Market</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 16px;
-      font-family: Arial, sans-serif;
-      background: #eeeeee;
-      color: #222222;
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 24px;
-    }
-
-    p {
-      text-align: center;
-      font-size: 14px;
-    }
-
-    .canvas-container {
-      width: 100%;
-      overflow: auto;
-      background: #ffffff;
-      border: 2px solid #000000;
-      padding: 4px;
-    }
-
-    canvas {
-      display: block;
-      width: 100%;
-      height: auto;
-      image-rendering: pixelated;
-      touch-action: pan-x pan-y;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Market</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 16px;
+  font-family: Arial, sans-serif;
+  background: #eeeeee;
+  color: #222;
+}
+h1 { margin: 0 0 8px; }
+p { line-height: 1.5; }
+.panel {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+#world {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: white;
+  border: 2px solid black;
+  touch-action: none;
+}
+button {
+  padding: 10px 14px;
+  margin: 4px 4px 4px 0;
+  border: 0;
+  border-radius: 6px;
+  background: #1769e0;
+  color: white;
+  font-size: 15px;
+}
+button:disabled { opacity: .5; }
+.info { overflow-wrap: anywhere; }
+</style>
 </head>
-
 <body>
-  <h1>Pixel Market</h1>
-  <p>Kanvas Pixel Art 100 × 100 kotak</p>
 
-  <div class="canvas-container">
-    <canvas id="pixelCanvas" width="1000" height="1000"></canvas>
-  </div>
+<h1>Pixel Market</h1>
+<p>Pilih area iklan dengan cara menarik jari di atas grid.</p>
 
-  <script>
-    const canvas = document.getElementById("pixelCanvas");
-    const ctx = canvas.getContext("2d");
+<div class="panel">
+  <strong>Ukuran kanvas:</strong> 10.000 × 10.000 unit
+  <br>
+  <strong>Ukuran satu kotak:</strong> 100 × 100 unit
+</div>
 
-    const canvasSize = 1000;
-    const gridSize = 10;
+<div class="panel">
+  <canvas id="world" width="1000" height="1000"></canvas>
+</div>
 
-    // Latar belakang putih
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvasSize, canvasSize);
+<div class="panel">
+  <strong>Informasi area pilihan</strong>
+  <p id="status" class="info">Belum ada area yang dipilih.</p>
+  <button id="cancel">Batal pilihan</button>
+  <button id="reset">Reset kanvas</button>
+</div>
 
-    // Gambar garis kotak
+<script>
+const canvas = document.getElementById("world");
+const ctx = canvas.getContext("2d");
+const statusText = document.getElementById("status");
+const cancelButton = document.getElementById("cancel");
+const resetButton = document.getElementById("reset");
+
+const GRID = 10; // 10 piksel kanvas = 100 unit dunia
+const UNIT_PER_PIXEL = 10;
+
+let start = null;
+let current = null;
+let dragging = false;
+let selection = null;
+
+function snap(value) {
+  return Math.max(0, Math.min(
+    canvas.width,
+    Math.round(value / GRID) * GRID
+  ));
+}
+
+function getPosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: snap((event.clientX - rect.left) * canvas.width / rect.width),
+    y: snap((event.clientY - rect.top) * canvas.height / rect.height)
+  };
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (let x = 0; x <= canvas.width; x += GRID) {
     ctx.beginPath();
-    ctx.strokeStyle = "#000000";
+    ctx.strokeStyle = (x / GRID) % 5 === 0 ? "#999999" : "#d6d6d6";
     ctx.lineWidth = 1;
-
-    for (let i = 0; i <= canvasSize; i += gridSize) {
-      ctx.moveTo(i, 0);
-      ctx.lineTo(i, canvasSize);
-
-      ctx.moveTo(0, i);
-      ctx.lineTo(canvasSize, i);
-    }
-
+    ctx.moveTo(x + 0.5, 0);
+    ctx.lineTo(x + 0.5, canvas.height);
     ctx.stroke();
-  </script>
+  }
+
+  for (let y = 0; y <= canvas.height; y += GRID) {
+    ctx.beginPath();
+    ctx.strokeStyle = (y / GRID) % 5 === 0 ? "#999999" : "#d6d6d6";
+    ctx.lineWidth = 1;
+    ctx.moveTo(0, y + 0.5);
+    ctx.lineTo(canvas.width, y + 0.5);
+    ctx.stroke();
+  }
+
+  const area = dragging && start && current
+    ? makeArea(start, current)
+    : selection;
+
+  if (area && area.width > 0 && area.height > 0) {
+    ctx.fillStyle = "rgba(25, 105, 224, 0.25)";
+    ctx.fillRect(area.x, area.y, area.width, area.height);
+    ctx.strokeStyle = "#1769e0";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(area.x + 1, area.y + 1,
+                   Math.max(0, area.width - 2),
+                   Math.max(0, area.height - 2));
+  }
+}
+
+function makeArea(a, b) {
+  return {
+    x: Math.min(a.x, b.x),
+    y: Math.min(a.y, b.y),
+    width: Math.abs(b.x - a.x),
+    height: Math.abs(b.y - a.y)
+  };
+}
+
+function updateStatus() {
+  if (!selection || !selection.width || !selection.height) {
+    statusText.textContent = "Belum ada area yang dipilih.";
+    return;
+  }
+
+  const x = selection.x * UNIT_PER_PIXEL;
+  const y = selection.y * UNIT_PER_PIXEL;
+  const width = selection.width * UNIT_PER_PIXEL;
+  const height = selection.height * UNIT_PER_PIXEL;
+
+  statusText.textContent =
+    `Posisi: X ${x}, Y ${y} | Lebar: ${width} unit | Tinggi: ${height} unit | Luas: ${width * height} unit²`;
+}
+
+canvas.addEventListener("pointerdown", event => {
+  if (event.button !== 0 && event.pointerType === "mouse") return;
+  event.preventDefault();
+  canvas.setPointerCapture(event.pointerId);
+  start = getPosition(event);
+  current = start;
+  dragging = true;
+  selection = null;
+  draw();
+  updateStatus();
+});
+
+canvas.addEventListener("pointermove", event => {
+  if (!dragging) return;
+  event.preventDefault();
+  current = getPosition(event);
+  draw();
+
+  const preview = makeArea(start, current);
+  if (preview.width && preview.height) {
+    statusText.textContent =
+      `Sedang memilih — Lebar: ${preview.width * UNIT_PER_PIXEL} unit, Tinggi: ${preview.height * UNIT_PER_PIXEL} unit`;
+  } else {
+    statusText.textContent = "Tarik jari untuk memilih area.";
+  }
+});
+
+function finishSelection(event) {
+  if (!dragging) return;
+  if (event) current = getPosition(event);
+  dragging = false;
+  selection = makeArea(start, current);
+  start = null;
+  current = null;
+
+  if (!selection.width || !selection.height) selection = null;
+  draw();
+  updateStatus();
+}
+
+canvas.addEventListener("pointerup", finishSelection);
+canvas.addEventListener("pointercancel", finishSelection);
+
+cancelButton.addEventListener("click", () => {
+  dragging = false;
+  start = null;
+  current = null;
+  selection = null;
+  draw();
+  updateStatus();
+});
+
+resetButton.addEventListener("click", () => {
+  dragging = false;
+  start = null;
+  current = null;
+  selection = null;
+  draw();
+  updateStatus();
+});
+
+draw();
+</script>
 </body>
 </html>
