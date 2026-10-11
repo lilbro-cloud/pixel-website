@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pixel Market — Admin</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #080d19;
+  --panel: #111a2d;
+  --border: #30405f;
+  --accent: #8b7cff;
+  --accent2: #6c5ce7;
+  --text: #f2f4ff;
+  --muted: #a7b2cc;
+  --success: #62e6b1;
+  --danger: #ff687e;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0;
+  padding: 12px;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 system-ui, sans-serif;
+}
+header, main, footer { max-width: 1100px; margin: auto; }
+header { padding: 12px 0; }
+h1 { margin: 0; font-size: clamp(24px, 5vw, 34px); }
+h2 { margin: 0 0 12px; font-size: 19px; }
+p, small { color: var(--muted); }
+.panel {
+  min-width: 0;
+  padding: 15px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 15px;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(270px, 1fr);
+  gap: 15px;
+  align-items: start;
+}
+input, textarea, select, button { font: inherit; }
+input, textarea, select {
+  width: 100%;
+  padding: 10px;
+  background: #0a1222;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+}
+textarea { min-height: 75px; resize: vertical; }
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+button:disabled { opacity: .5; cursor: not-allowed; }
+button.secondary { background: #34415d; }
+button.danger { background: #a9334a; }
+.field { margin-bottom: 12px; }
+label { display: block; font-weight: 650; margin-bottom: 5px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 100px; }
+#loginScreen { max-width: 430px; margin: 30px auto; }
+#app { display: none; }
+#board {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 2px solid #7167bd;
+  border-radius: 10px;
+  background-color: #0b1223;
+  background-image:
+    linear-gradient(#263451 1px, transparent 1px),
+    linear-gradient(90deg, #263451 1px, transparent 1px);
+  background-size: 5% 8.89%;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: crosshair;
+}
+.ad-box {
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid #a99eff;
+  background: #202b43;
+  pointer-events: none;
+}
+.ad-box img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  pointer-events: none;
+}
+.ad-title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 3px;
+  background: #000b;
+  color: white;
+  font-size: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+#selection {
+  position: absolute;
+  display: none;
+  z-index: 1000;
+  border: 2px dashed white;
+  outline: 1px solid var(--accent);
+  background: #8b7cff55;
+  pointer-events: none;
+}
+#emptyBoard {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  text-align: center;
+  color: var(--muted);
+  pointer-events: none;
+}
+#status {
+  min-height: 42px;
+  padding: 10px;
+  margin: 12px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+#status.ok { color: var(--success); }
+#status.error { color: #ff9aaa; }
+#selectionInfo { font-size: 13px; color: #d8d3ff; }
+#preview {
+  display: none;
+  max-width: 100%;
+  max-height: 220px;
+  margin: 8px 0;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.ad-list { display: grid; gap: 10px; }
+.ad-item {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+.ad-item img {
+  display: block;
+  max-width: 100%;
+  max-height: 130px;
+  margin: 8px 0;
+  border-radius: 7px;
+  object-fit: contain;
+}
+.ad-item p { font-size: 13px; margin: 5px 0; }
+.pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: #303b56;
+  font-size: 12px;
+}
+.pill.active { color: var(--success); }
+.pill.inactive { color: #ffb7c2; }
+[hidden] { display: none !important; }
+footer { padding: 15px 0; color: var(--muted); font-size: 12px; }
+@media(max-width: 760px) {
+  .layout { grid-template-columns: 1fr; }
+  .panel { padding: 12px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🟪 Pixel Market — Admin</h1>
+  <p>Panel pengelola papan iklan.</p>
+</header>
+
+<section id="loginScreen" class="panel">
+  <h2>🔐 Login Admin</h2>
+  <p>Masukkan PIN untuk membuka panel.</p>
+  <form id="loginForm">
+    <div class="field">
+      <label for="pinInput">PIN admin</label>
+      <input id="pinInput" type="password" inputmode="numeric"
+        autocomplete="current-password" required maxlength="30"
+        placeholder="Masukkan PIN">
+    </div>
+    <button type="submit" style="width:100%">Masuk</button>
+  </form>
+  <div id="loginStatus" role="status" style="margin-top:10px"></div>
+  <p><small>PIN default: 1234. Ubah di kode sebelum digunakan.</small></p>
+</section>
+
+<main id="app">
+  <div class="panel">
+    <div class="row">
+      <button id="exportBtn">⬇ Export JSON</button>
+      <button id="importBtn" class="secondary">⬆ Import JSON</button>
+      <button id="logoutBtn" class="danger">Keluar</button>
+    </div>
+    <input id="importFile" type="file" accept=".json,application/json" hidden>
+    <div id="status" role="status" aria-live="polite">Panel admin siap.</div>
+  </div>
+
+  <div class="layout">
+    <section>
+      <div class="panel">
+        <h2>🖼️ Papan Iklan</h2>
+        <div id="board">
+          <div id="emptyBoard">Papan masih kosong</div>
+          <div id="selection"></div>
+        </div>
+        <p>Tarik jari atau mouse di papan untuk memilih area iklan.</p>
+        <p id="selectionInfo">Belum ada area terpilih.</p>
+        <div class="row">
+          <button id="clearBtn" class="secondary">Batalkan Area</button>
+          <button id="resetFormBtn" class="secondary">Iklan Baru</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>📋 Semua Iklan</h2>
+        <div id="adList" class="ad-list"></div>
+      </div>
+    </section>
+
+    <aside>
+      <div class="panel">
+        <h2 id="formTitle">➕ Tambah Iklan</h2>
+        <form id="adForm">
+          <div class="field">
+            <label for="adName">Nama iklan</label>
+            <input id="adName" maxlength="80" required
+              placeholder="Contoh: Toko Pixel">
+          </div>
+          <div class="field">
+            <label for="adUrl">URL tujuan</label>
+            <input id="adUrl" type="url" required
+              placeholder="https://contoh.com">
+          </div>
+          <div class="field">
+            <label for="adDescription">Deskripsi</label>
+            <textarea id="adDescription" maxlength="500"
+              placeholder="Deskripsi opsional"></textarea>
+          </div>
+          <div class="field">
+            <label for="adImage">Gambar iklan</label>
+            <input id="adImage" type="file" accept="image/*">
+            <img id="preview" alt="Pratinjau gambar">
+            <small id="imageHelp">Maksimal 5 MB sebelum diproses.</small>
+          </div>
+          <div class="field">
+            <label for="adStatus">Status</label>
+            <select id="adStatus">
+              <option value="active">Aktif</option>
+              <option value="inactive">Nonaktif</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Koordinat area</label>
+            <div id="rectInfo">Belum ada area.</div>
+            <small>Papan 2000 × 1125. Minimum area 30 × 30.</small>
+          </div>
+          <div class="row">
+            <button id="saveBtn" type="submit">Simpan Iklan</button>
+            <button id="cancelEditBtn" class="secondary" type="button" hidden>
+              Batal Edit
+            </button>
+          </div>
+        </form>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>Pixel Market Admin · Penyimpanan lokal browser.</footer>
+
+<script>
+"use strict";
+
+(function () {
+  // Ubah PIN ini. PIN dalam HTML bukan keamanan sungguhan.
+  var ADMIN_PIN = "1234";
+
+  var BOARD_W = 2000;
+  var BOARD_H = 1125;
+  var MIN_SIZE = 30;
+  var MAX_FILE_SIZE = 5 * 1024 * 1024;
+  var MAX_IMAGE_SIDE = 900;
+  var STORAGE_KEY = "pixelmarket_ads_v7";
+
+  var $ = function (id) {
+    return document.getElementById(id);
+  };
+
+  var loginScreen = $("loginScreen");
+  var app = $("app");
+  var board = $("board");
+  var selection = $("selection");
+  var statusEl = $("status");
+  var adList = $("adList");
+  var emptyBoard = $("emptyBoard");
+  var preview = $("preview");
+  var imageInput = $("adImage");
+
+  var ads = [];
+  var drag = null;
+  var dragMoved = false;
+  var selectedRect = null;
+  var editingId = null;
+  var currentImage = null;
+  var originalImage = null;
+  var imageToken = 0;
+
+  function setStatus(message, type) {
+    statusEl.textContent = message;
+    statusEl.className = type || "";
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function boardPoint(event) {
+    var r = board.getBoundingClientRect();
+    return {
+      x: clamp((event.clientX - r.left) / r.width * BOARD_W, 0, BOARD_W),
+      y: clamp((event.clientY - r.top) / r.height * BOARD_H, 0, BOARD_H)
+    };
+  }
+
+  function rectangleBetween(a, b) {
+    var left = Math.min(a.x, b.x);
+    var top = Math.min(a.y, b.y);
+    return {
+      x: Math.round(left),
+      y: Math.round(top),
+      w: Math.round(Math.max(a.x, b.x) - left),
+      h: Math.round(Math.max(a.y, b.y) - top)
+    };
+  }
+
+  function clampRect(rect) {
+    var w = Math.round(clamp(Number(rect.w) || 0, 0, BOARD_W));
+    var h = Math.round(clamp(Number(rect.h) || 0, 0, BOARD_H));
+    var x = Math.round(clamp(Number(rect.x) || 0, 0, BOARD_W - w));
+    var y = Math.round(clamp(Number(rect.y) || 0, 0, BOARD_H - h));
+    return { x: x, y: y, w: w, h: h };
+  }
+
+  function showSelection(rect) {
+    if (!rect) {
+      selection.style.display = "none";
+      return;
+    }
+    selection.style.display = "block";
+    selection.style.left = (rect.x / BOARD_W * 100) + "%";
+    selection.style.top = (rect.y / BOARD_H * 100) + "%";
+    selection.style.width = (rect.w / BOARD_W * 100) + "%";
+    selection.style.height = (rect.h / BOARD_H * 100) + "%";
+  }
+
+  function updateRectInfo(rect) {
+    var text = rect
+      ? "X: " + rect.x + ", Y: " + rect.y +
+        ", Lebar: " + rect.w + ", Tinggi: " + rect.h
+      : "Belum ada area.";
+    $("selectionInfo").textContent = text;
+    $("rectInfo").textContent = text;
+  }
+
+  function clearSelection(message) {
+    selectedRect = null;
+    showSelection(null);
+    updateRectInfo(null);
+    if (message) setStatus(message);
+  }
+
+  function intersects(a, b) {
+    return a.x < b.x + b.w &&
+      a.x + a.w > b.x &&
+      a.y < b.y + b.h &&
+      a.y + a.h > b.y;
+  }
+
+  function validUrl(value) {
+    try {
+      var u = new URL(value);
+      return u.protocol === "https:" || u.protocol === "http:";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function makeId() {
+    return "ad_" + Date.now() + "_" +
+      Math.random().toString(36).slice(2, 8);
+  }
+
+  function saveStorage() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(ads));
+      return true;
+    } catch (error) {
+      setStatus(
+        "Penyimpanan penuh atau tidak tersedia. Coba gambar lebih kecil atau hapus iklan lama.",
+        "error"
+      );
+      return false;
+    }
+  }
+
+  function isValidAd(ad) {
+    if (!ad || typeof ad !== "object") return false;
+    if (typeof ad.id !== "string" || !ad.id) return false;
+    if (typeof ad.name !== "string" || !ad.name.trim()) return false;
+    if (typeof ad.url !== "string" || !validUrl(ad.url)) return false;
+    if (ad.status !== "active" && ad.status !== "inactive") return false;
+    if (typeof ad.image !== "string" ||
+        !/^data:image\/(jpeg|jpg);base64,/i.test(ad.image)) return false;
+    if (!ad.rect || typeof ad.rect !== "object") return false;
+
+    var r = ad.rect;
+    if (![r.x, r.y, r.w, r.h].every(function (n) {
+      return Number.isFinite(Number(n));
+    })) return false;
+
+    var rect = clampRect(r);
+    return rect.w >= MIN_SIZE && rect.h >= MIN_SIZE;
+  }
+
+  function loadStorage() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        ads = [];
+        return;
+      }
+
+      var parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) {
+        throw new Error("Format data bukan array.");
+      }
+
+      ads = parsed.filter(isValidAd).map(function (ad) {
+        return {
+          id: ad.id,
+          name: ad.name,
+          url: ad.url,
+          description: typeof ad.description === "string" ? ad.description : "",
+          status: ad.status,
+          image: ad.image,
+          rect: clampRect(ad.rect),
+          createdAt: Number(ad.createdAt) || Date.now()
+        };
+      });
+    } catch (error) {
+      ads = [];
+      setStatus("Data lokal gagal dibaca. Coba import ads.json.", "error");
+    }
+  }
+
+  function renderBoard() {
+    board.querySelectorAll(".ad-box").forEach(function (el) {
+      el.remove();
+    });
+
+    var active = ads.filter(function (ad) {
+      return ad.status === "active";
+    });
+
+    emptyBoard.style.display = active.length ? "none" : "block";
+
+    active.forEach(function (ad) {
+      var r = clampRect(ad.rect);
+      var box = document.createElement("div");
+      box.className = "ad-box";
+      box.style.left = (r.x / BOARD_W * 100) + "%";
+      box.style.top = (r.y / BOARD_H * 100) + "%";
+      box.style.width = (r.w / BOARD_W * 100) + "%";
+      box.style.height = (r.h / BOARD_H * 100) + "%";
+
+      var img = document.createElement("img");
+      img.src = ad.image;
+      img.alt = ad.name;
+      img.draggable = false;
+
+      var title = document.createElement("span");
+      title.className = "ad-title";
+      title.textContent = ad.name;
+
+      box.append(img, title);
+      board.insertBefore(box, selection);
+    });
+  }
+
+  function makeButton(text, className, callback) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = text;
+    b.className = className || "";
+    b.addEventListener("click", callback);
+    return b;
+  }
+
+  function renderList() {
+    adList.replaceChildren();
+
+    if (!ads.length) {
+      var p = document.createElement("p");
+      p.textContent = "Belum ada iklan.";
+      adList.append(p);
+      return;
+    }
+
+    ads.forEach(function (ad) {
+      var item = document.createElement("article");
+      item.className = "ad-item";
+
+      var pill = document.createElement("span");
+      pill.className = "pill " + ad.status;
+      pill.textContent = ad.status === "active" ? "Aktif" : "Nonaktif";
+
+      var title = document.createElement("h3");
+      title.textContent = ad.name;
+
+      var img = document.createElement("img");
+      img.src = ad.image;
+      img.alt = ad.name;
+      img.loading = "lazy";
+
+      var desc = document.createElement("p");
+      desc.textContent = ad.description || "Tanpa deskripsi.";
+
+      var url = document.createElement("a");
+      url.href = ad.url;
+      url.target = "_blank";
+      url.rel = "noopener noreferrer";
+      url.textContent = ad.url;
+
+      var size = document.createElement("p");
+      size.textContent = "Area: " + ad.rect.w + " × " + ad.rect.h;
+
+      var actions = document.createElement("div");
+      actions.className = "row";
+      actions.append(
+        makeButton("Edit", "secondary", function () {
+          startEdit(ad.id);
+        }),
+        makeButton(
+          ad.status === "active" ? "Nonaktifkan" : "Aktifkan",
+          "secondary",
+          function () { toggleStatus(ad.id); }
+        ),
+        makeButton("Hapus", "danger", function () {
+          deleteAd(ad.id);
+        })
+      );
+
+      item.append(pill, title, img, desc, url, size, actions);
+      adList.append(item);
+    });
+  }
+
+  function renderAll() {
+    renderBoard();
+    renderList();
+  }
+  </script>
+  
+// Drag memakai Pointer Events.
+// Tidak menggunakan lostpointercapture atau setPointerCapture.
+// Tidak memanggil preventDefault() pada pointerdown.
+board.addEventListener("pointerdown", function (event) {
+  if (event.pointerType === "mouse" && event.button !== 0) return;
+  if (drag) return;
+
+  var p = boardPoint(event);
+  dragMoved = false;
+  drag = {
+    pointerId: event.pointerId,
+    start: p
+  };
+
+  selectedRect = {
+    x: Math.round(p.x),
+    y: Math.round(p.y),
+    w: 0,
+    h: 0
+  };
+
+  showSelection(selectedRect);
+  updateRectInfo(selectedRect);
+  setStatus("Sentuhan terdeteksi. Geser untuk memilih area.", "ok");
+});
+
+document.addEventListener("pointermove", function (event) {
+  if (!drag || event.pointerId !== drag.pointerId) return;
+
+  var p = boardPoint(event);
+  var dx = p.x - drag.start.x;
+  var dy = p.y - drag.start.y;
+
+  if (Math.abs(dx) + Math.abs(dy) >= 3) {
+    dragMoved = true;
+  }
+
+  selectedRect = rectangleBetween(drag.start, p);
+  showSelection(selectedRect);
+  updateRectInfo(selectedRect);
+});
+
+document.addEventListener("pointerup", function (event) {
+  if (!drag || event.pointerId !== drag.pointerId) return;
+
+  var rect = rectangleBetween(drag.start, boardPoint(event));
+  var moved = dragMoved;
+  drag = null;
+
+  if (!moved || rect.w < MIN_SIZE || rect.h < MIN_SIZE) {
+    clearSelection("Area terlalu kecil. Coba tarik lebih jauh.");
+    return;
+  }
+
+  selectedRect = clampRect(rect);
+  showSelection(selectedRect);
+  updateRectInfo(selectedRect);
+  setStatus("Area berhasil dipilih.", "ok");
+});
+
+document.addEventListener("pointercancel", function (event) {
+  if (!drag || event.pointerId !== drag.pointerId) return;
+  drag = null;
+  clearSelection("Drag dibatalkan perangkat. Silakan coba lagi.");
+});
+
+$("clearBtn").addEventListener("click", function () {
+  drag = null;
+  clearSelection("Seleksi area dibatalkan.");
+});
+
+function setPreview(dataUrl) {
+  if (!dataUrl) {
+    preview.removeAttribute("src");
+    preview.style.display = "none";
+    return;
+  }
+  preview.src = dataUrl;
+  preview.style.display = "block";
+}
+
+function processImage(file) {
+  return new Promise(function (resolve, reject) {
+    if (!file.type || file.type.indexOf("image/") !== 0) {
+      reject(new Error("File harus berupa gambar."));
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      reject(new Error("Ukuran gambar maksimal 5 MB."));
+      return;
+    }
+
+    var reader = new FileReader();
+
+    reader.onerror = function () {
+      reject(new Error("Gagal membaca gambar."));
+    };
+
+    reader.onload = function () {
+      var img = new Image();
+
+      img.onerror = function () {
+        reject(new Error("Gambar tidak bisa dibuka."));
+      };
+
+      img.onload = function () {
+        var scale = Math.min(
+          1,
+          MAX_IMAGE_SIDE / Math.max(img.naturalWidth, img.naturalHeight)
+        );
+        var width = Math.max(1, Math.round(img.naturalWidth * scale));
+        var height = Math.max(1, Math.round(img.naturalHeight * scale));
+        var canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        var ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Browser tidak mendukung pemrosesan gambar."));
+          return;
+        }
+
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        try {
+          resolve(canvas.toDataURL("image/jpeg", 0.82));
+        } catch (error) {
+          reject(new Error("Gagal mengubah gambar menjadi JPEG."));
+        }
+      };
+
+      img.src = String(reader.result);
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+imageInput.addEventListener("change", async function () {
+  var file = imageInput.files && imageInput.files[0];
+  if (!file) return;
+
+  var token = ++imageToken;
+  $("imageHelp").textContent = "Sedang memproses gambar...";
+
+  try {
+    var dataUrl = await processImage(file);
+    if (token !== imageToken) return;
+
+    currentImage = dataUrl;
+    originalImage = dataUrl;
+    setPreview(dataUrl);
+    $("imageHelp").textContent = "Gambar siap: JPEG, maksimal 900 px.";
+    setStatus("Gambar berhasil diproses.", "ok");
+  } catch (error) {
+    if (token !== imageToken) return;
+    imageInput.value = "";
+    $("imageHelp").textContent = error.message;
+    setStatus(error.message, "error");
+  }
+});
+
+function resetForm() {
+  imageToken++;
+  $("adForm").reset();
+  editingId = null;
+  currentImage = null;
+  originalImage = null;
+  imageInput.required = true;
+  $("formTitle").textContent = "➕ Tambah Iklan";
+  $("saveBtn").textContent = "Simpan Iklan";
+  $("cancelEditBtn").hidden = true;
+  $("imageHelp").textContent = "Maksimal 5 MB sebelum diproses.";
+  setPreview(null);
+}
+
+$("resetFormBtn").addEventListener("click", function () {
+  resetForm();
+  clearSelection("Form siap. Pilih area baru di papan.");
+});
+
+$("cancelEditBtn").addEventListener("click", function () {
+  resetForm();
+  clearSelection("Edit dibatalkan.");
+});
+
+function startEdit(id) {
+  var ad = ads.find(function (item) { return item.id === id; });
+  if (!ad) return;
+
+  editingId = id;
+  currentImage = ad.image;
+  originalImage = ad.image;
+
+  $("adName").value = ad.name;
+  $("adUrl").value = ad.url;
+  $("adDescription").value = ad.description || "";
+  $("adStatus").value = ad.status;
+  imageInput.value = "";
+  imageInput.required = false;
+
+  $("formTitle").textContent = "✏️ Edit Iklan";
+  $("saveBtn").textContent = "Simpan Perubahan";
+  $("cancelEditBtn").hidden = false;
+  $("imageHelp").textContent = "Pilih file baru hanya jika ingin mengganti gambar.";
+
+  setPreview(ad.image);
+  selectedRect = clampRect(ad.rect);
+  showSelection(selectedRect);
+  updateRectInfo(selectedRect);
+  setStatus("Mode edit: " + ad.name, "ok");
+  $("formTitle").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function toggleStatus(id) {
+  var index = ads.findIndex(function (ad) { return ad.id === id; });
+  if (index < 0) return;
+
+  var ad = ads[index];
+  var next = ad.status === "active" ? "inactive" : "active";
+
+  if (next === "active") {
+    var conflict = ads.some(function (other) {
+      return other.id !== id &&
+        other.status === "active" &&
+        intersects(other.rect, ad.rect);
+    });
+
+    if (conflict) {
+      setStatus("Area bertumpuk dengan iklan aktif lain.", "error");
+      return;
+    }
+  }
+
+  var previous = ad.status;
+  ad.status = next;
+
+  if (!saveStorage()) {
+    ad.status = previous;
+    return;
+  }
+
+  renderAll();
+  setStatus("Status iklan diperbarui.", "ok");
+}
+
+function deleteAd(id) {
+  var ad = ads.find(function (item) { return item.id === id; });
+  if (!ad) return;
+  if (!confirm('Hapus iklan "' + ad.name + '"?')) return;
+
+  var previous = ads.slice();
+  ads = ads.filter(function (item) { return item.id !== id; });
+
+  if (!saveStorage()) {
+    ads = previous;
+    return;
+  }
+
+  if (editingId === id) {
+    resetForm();
+    clearSelection();
+  }
+
+  renderAll();
+  setStatus("Iklan berhasil dihapus.", "ok");
+}
+
+$("adForm").addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  var name = $("adName").value.trim();
+  var url = $("adUrl").value.trim();
+  var description = $("adDescription").value.trim();
+  var status = $("adStatus").value;
+
+  if (!name) {
+    setStatus("Nama iklan wajib diisi.", "error");
+    return;
+  }
+
+  if (!validUrl(url)) {
+    setStatus("URL harus memakai http:// atau https://.", "error");
+    return;
+  }
+
+  if (!selectedRect ||
+      selectedRect.w < MIN_SIZE ||
+      selectedRect.h < MIN_SIZE) {
+    setStatus("Pilih area minimal 30 × 30 terlebih dahulu.", "error");
+    return;
+  }
+
+  var image = currentImage || originalImage;
+  if (!image) {
+    setStatus("Pilih gambar iklan terlebih dahulu.", "error");
+    return;
+  }
+
+  var rect = clampRect(selectedRect);
+
+  if (status === "active") {
+    var conflict = ads.some(function (other) {
+      return other.id !== editingId &&
+        other.status === "active" &&
+        intersects(other.rect, rect);
+    });
+
+    if (conflict) {
+      setStatus("Area bertumpuk dengan iklan aktif lain.", "error");
+      return;
+    }
+  }
+
+  var previous = ads.slice();
+  var old = editingId
+    ? ads.find(function (ad) { return ad.id === editingId; })
+    : null;
+
+  var ad = {
+    id: old ? old.id : makeId(),
+    name: name,
+    url: url,
+    description: description,
+    status: status,
+    image: image,
+    rect: rect,
+    createdAt: old ? old.createdAt : Date.now()
+  };
+
+  if (old) {
+    ads = ads.map(function (item) {
+      return item.id === old.id ? ad : item;
+    });
+  } else {
+    ads.push(ad);
+  }
+
+  if (!saveStorage()) {
+    ads = previous;
+    return;
+  }
+
+  renderAll();
+  resetForm();
+  clearSelection();
+  setStatus("Iklan berhasil disimpan di browser ini!", "ok");
+});
+
+function downloadJson() {
+  var blob = new Blob(
+    [JSON.stringify(ads, null, 2)],
+    { type: "application/json;charset=utf-8" }
+  );
+  var url = URL.createObjectURL(blob);
+  var link = document.createElement("a");
+
+  link.href = url;
+  link.download = "ads.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(function () {
+    URL.revokeObjectURL(url);
+  }, 1000);
+
+  setStatus("Export selesai: ads.json", "ok");
+}
+
+$("exportBtn").addEventListener("click", downloadJson);
+
+$("importBtn").addEventListener("click", function () {
+  $("importFile").click();
+});
+
+$("importFile").addEventListener("change", function () {
+  var file = this.files && this.files[0];
+  if (!file) return;
+
+  var reader = new FileReader();
+
+  reader.onerror = function () {
+    setStatus("Gagal membaca file JSON.", "error");
+  };
+
+  reader.onload = function () {
+    try {
+      var data = JSON.parse(String(reader.result));
+
+      if (!Array.isArray(data)) {
+        throw new Error("JSON harus berisi array iklan.");
+      }
+
+      if (!data.every(isValidAd)) {
+        throw new Error("Ada data iklan yang formatnya tidak valid.");
+      }
+
+      var clean = data.map(function (ad) {
+        return {
+          id: ad.id,
+          name: ad.name.trim(),
+          url: ad.url,
+          description: typeof ad.description === "string" ? ad.description : "",
+          status: ad.status,
+          image: ad.image,
+          rect: clampRect(ad.rect),
+          createdAt: Number(ad.createdAt) || Date.now()
+        };
+      });
+
+      var active = clean.filter(function (ad) {
+        return ad.status === "active";
+      });
+
+      for (var i = 0; i < active.length; i++) {
+        for (var j = i + 1; j < active.length; j++) {
+          if (intersects(active[i].rect, active[j].rect)) {
+            throw new Error("Dua iklan aktif memiliki area bertumpuk.");
+          }
+        }
+      }
+
+      if (!confirm("Import akan mengganti semua iklan lokal. Lanjutkan?")) {
+        return;
+      }
+
+      var previous = ads;
+      ads = clean;
+
+      if (!saveStorage()) {
+        ads = previous;
+        return;
+      }
+
+      resetForm();
+      clearSelection();
+      renderAll();
+      setStatus("Import berhasil.", "ok");
+    } catch (error) {
+      setStatus("Import gagal: " + error.message, "error");
+    } finally {
+      $("importFile").value = "";
+    }
+  };
+
+  reader.readAsText(file);
+});
+
+$("loginForm").addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  if ($("pinInput").value !== ADMIN_PIN) {
+    $("loginStatus").textContent = "PIN salah. Coba lagi.";
+    $("loginStatus").style.color = "var(--danger)";
+    $("pinInput").select();
+    return;
+  }
+
+  $("loginStatus").textContent = "";
+  loginScreen.style.display = "none";
+  app.style.display = "block";
+  $("pinInput").value = "";
+
+  loadStorage();
+  renderAll();
+  setStatus("Login berhasil. Selamat bekerja!", "ok");
+});
+
+$("logoutBtn").addEventListener("click", function () {
+  resetForm();
+  clearSelection();
+  app.style.display = "none";
+  loginScreen.style.display = "block";
+  $("pinInput").value = "";
+  $("loginStatus").textContent = "Kamu sudah keluar.";
+  $("loginStatus").style.color = "var(--muted)";
+});
+})();
+</script>
+</body>
+</html>
