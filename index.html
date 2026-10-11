@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Pixel Market v5</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pixel Market v6</title>
 <style>
   :root {
     color-scheme: dark;
@@ -11,6 +11,7 @@
     --panel: #111a2d;
     --border: #30405f;
     --accent: #8b7cff;
+    --accent2: #6c5ce7;
     --text: #f2f4ff;
     --muted: #a7b2cc;
     --danger: #ff687e;
@@ -19,10 +20,10 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
     margin: 0;
-    padding: 16px;
+    padding: 14px;
     background: var(--bg);
     color: var(--text);
-    font: 15px/1.5 system-ui, sans-serif;
+    font: 15px/1.5 system-ui, -apple-system, sans-serif;
   }
   button, input, textarea, select { font: inherit; }
   button {
@@ -33,13 +34,19 @@
     border-radius: 9px;
     font-weight: 700;
     cursor: pointer;
+    transition: background .15s;
   }
+  button:hover { background: var(--accent2); }
   button:disabled { opacity: .5; cursor: not-allowed; }
   button.secondary { background: #34415d; }
+  button.secondary:hover { background: #445272; }
   button.danger { background: #a9334a; }
+  button.danger:hover { background: #c53a56; }
+  a { color: #b8afff; overflow-wrap: anywhere; }
   header, main, footer { max-width: 1200px; margin: auto; }
-  h1 { margin: 0 0 4px; font-size: clamp(24px, 5vw, 36px); }
-  h2 { margin-top: 0; font-size: 20px; }
+  header { margin-bottom: 16px; }
+  h1 { margin: 0 0 4px; font-size: clamp(24px, 5vw, 34px); }
+  h2 { margin-top: 0; font-size: 19px; }
   p { color: var(--muted); }
   .layout {
     display: grid;
@@ -71,6 +78,7 @@
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
+    -webkit-touch-callout: none;
     cursor: crosshair;
   }
   .ad-box {
@@ -99,40 +107,113 @@
     z-index: 1000;
     display: none;
     border: 2px dashed #fff;
-    background: #8b7cff40;
+    outline: 1px solid #7668ff;
+    background: #8b7cff80;
     pointer-events: none;
+    box-shadow: 0 0 12px #8b7cffaa;
   }
   .hint { margin: 10px 0 0; font-size: 13px; }
   .status {
     min-height: 42px;
     margin-top: 12px;
-    padding: 10px;
+    padding: 10px 12px;
     border: 1px solid var(--border);
     border-radius: 9px;
     color: var(--muted);
     overflow-wrap: anywhere;
+    font-size: 14px;
   }
-  .status.ok { color: var(--success); }
-  .status.error { color: #ff9aaa; }
-  .field { margin-bottom: 13px; }
-  label { display: block; margin-bottom: 5px; font-weight: 650; }
-  input, textarea, select {
+  .status.ok { color: var(--success); border-color: #2a6e52; }
+  .status.error { color: #ff9aaa; border-color: #6e2a3a; }
+  #selectionInfo {
+    margin: 8px 0;
+    color: #d8d3ff;
+    font-size: 13px;
+  }
+  .field { margin-bottom: 14px; }
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 650;
+    font-size: 14px;
+  }
+  input[type="text"], input[type="url"], textarea, select {
     width: 100%;
-    padding: 10px;
+    padding: 10px 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: #0a1222;
     color: var(--text);
+    outline: none;
+    transition: border-color .15s;
   }
-  textarea { min-height: 75px; resize: vertical; }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+  }
+  textarea { min-height: 70px; resize: vertical; }
   .row { display: flex; gap: 8px; flex-wrap: wrap; }
-  .row > * { flex: 1; }
+  .row > * { flex: 1; min-width: 0; }
+  .file-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #0a1222;
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .file-wrap:hover, .file-wrap:active {
+    border-color: var(--accent);
+    background: #131b2e;
+  }
+  .file-wrap.has-file {
+    border-style: solid;
+    border-color: var(--accent);
+    background: #171f38;
+  }
+  .file-wrap input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+  .file-icon {
+    flex-shrink: 0;
+    width: 36px; height: 36px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 9px;
+    font-size: 18px;
+  }
+  .file-info { flex: 1; min-width: 0; }
+  .file-label {
+    display: block;
+    font-weight: 650;
+    color: var(--text);
+    font-size: 14px;
+  }
+  .file-name {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  .file-wrap.has-file .file-name { color: var(--success); }
   #preview {
     display: none;
     max-width: 100%;
     max-height: 200px;
     object-fit: contain;
-    margin: 8px 0;
+    margin-top: 10px;
     border-radius: 8px;
     border: 1px solid var(--border);
   }
@@ -143,7 +224,7 @@
     border-radius: 10px;
     overflow-wrap: anywhere;
   }
-  .ad-item h3 { margin: 0 0 4px; }
+  .ad-item h3 { margin: 0 0 4px; font-size: 16px; }
   .ad-item img {
     display: block;
     width: 100%;
@@ -165,8 +246,14 @@
   .pill.active { color: var(--success); }
   .pill.inactive { color: #ffb7c2; }
   .empty { color: var(--muted); padding: 10px 0; }
-  small { color: var(--muted); }
-  footer { margin: 18px auto; color: var(--muted); font-size: 12px; }
+  small { color: var(--muted); font-size: 12px; }
+  footer {
+    max-width: 1200px;
+    margin: 18px auto 8px;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+  }
   @media (max-width: 760px) {
     body { padding: 10px; }
     .layout { grid-template-columns: 1fr; }
@@ -179,7 +266,6 @@
   <h1>🟪 Pixel Market</h1>
   <p>Pasang iklanmu di papan pixel digital.</p>
 </header>
-
 <main>
   <div class="layout">
     <section>
@@ -189,38 +275,45 @@
           <div id="selection"></div>
         </div>
         <p class="hint">Tarik jari atau mouse pada area kosong untuk memilih kotak iklan.</p>
-        <div id="status" class="status" role="status" aria-live="polite">Memulai…</div>
+        <div id="status" class="status" role="status" aria-live="polite">Memuat…</div>
         <p id="selectionInfo">Area belum dipilih.</p>
         <div class="row">
           <button id="clearSelection" class="secondary" type="button">Batalkan Seleksi</button>
           <button id="refresh" class="secondary" type="button">Muat Ulang</button>
         </div>
       </div>
-
       <div class="panel">
         <h2>📋 Daftar Iklan</h2>
-        <div id="adList" class="ad-list"><p class="empty">Memuat iklan…</p></div>
+        <div id="adList" class="ad-list">
+          <p class="empty">Belum ada iklan.</p>
+        </div>
       </div>
     </section>
-
     <aside>
       <div class="panel">
         <h2 id="formTitle">➕ Buat Iklan</h2>
-        <form id="adForm">
+        <form id="adForm" novalidate>
           <div class="field">
             <label for="adName">Nama iklan</label>
-            <input id="adName" maxlength="80" required placeholder="Contoh: Toko Pixel">
+            <input id="adName" type="text" maxlength="80" placeholder="Contoh: Toko Pixel">
           </div>
           <div class="field">
             <label for="adUrl">Tautan iklan</label>
-            <input id="adUrl" type="url" required placeholder="https://contoh.com">
-            <small>Gunakan tautan HTTP atau HTTPS.</small>
+            <input id="adUrl" type="url" placeholder="https://contoh.com">
+            <small>Gunakan tautan http:// atau https://</small>
           </div>
           <div class="field">
-            <label for="adImage">Gambar iklan</label>
-            <input id="adImage" type="file" accept="image/*">
-            <img id="preview" alt="Pratinjau">
-            <small>Format gambar didukung browser. Maks 5MB.</small>
+            <label>Gambar iklan</label>
+            <div class="file-wrap" id="fileWrap">
+              <span class="file-icon">🖼️</span>
+              <span class="file-info">
+                <span class="file-label">Ketuk untuk pilih gambar</span>
+                <span class="file-name" id="fileName">Belum ada gambar</span>
+              </span>
+              <input id="adImage" type="file" accept="image/*">
+            </div>
+            <img id="preview" alt="Pratinjau gambar">
+            <small>Otomatis dikompres. Maks 5 MB.</small>
           </div>
           <div class="field">
             <label for="adDescription">Deskripsi (opsional)</label>
@@ -235,7 +328,7 @@
           </div>
           <div class="field">
             <label>Ukuran area terpilih</label>
-            <div id="formSelectionInfo">Belum ada area.</div>
+            <div id="formSelectionInfo" style="color:var(--muted);font-size:14px;">Belum ada area.</div>
           </div>
           <div class="row">
             <button id="saveButton" type="submit">Simpan Iklan</button>
@@ -243,388 +336,501 @@
           </div>
         </form>
       </div>
-
       <div class="panel">
         <h2>ℹ️ Petunjuk</h2>
-        <p>1. Tarik kotak pada papan.</p>
-        <p>2. Isi nama, tautan, dan gambar.</p>
-        <p>3. Tekan Simpan Iklan.</p>
-        <p>4. Gunakan tombol di daftar untuk edit / aktif-nonaktif / hapus.</p>
-        <small>Data disimpan lokal di browser ini (IndexedDB).</small>
+        <p style="margin:6px 0;">1. Tarik kotak pada papan.</p>
+        <p style="margin:6px 0;">2. Isi nama, tautan, dan gambar.</p>
+        <p style="margin:6px 0;">3. Tekan Simpan Iklan.</p>
+        <p style="margin:6px 0;">4. Kelola iklan dari daftar di bawah papan.</p>
+        <small>Data disimpan lokal di browser ini.</small>
       </div>
     </aside>
   </div>
 </main>
-
-<footer>Pixel Market v5 · Drag Fix · Local Storage</footer>
-
+<footer>Pixel Market v6 · localStorage · Drag Fix</footer>
 <script>
-"use strict";
-(() => {
-  // ===== KONFIGURASI =====
-  const BOARD_W = 10000;
-  const BOARD_H = 5625;
-  const MIN_SIZE = 100;
-  const MAX_IMAGE = 5 * 1024 * 1024;
-  const DB_NAME = "PixelMarketV5";
-  const DB_VERSION = 1;
-
-  // ===== ELEMEN =====
-  const $ = id => document.getElementById(id);
-  const board = $("board");
-  const selectionEl = $("selection");
-  const statusEl = $("status");
-  const selectionInfo = $("selectionInfo");
-  const formSelectionInfo = $("formSelectionInfo");
-  const form = $("adForm");
-  const imageInput = $("adImage");
-  const preview = $("preview");
-  const adList = $("adList");
-  const formTitle = $("formTitle");
-  const saveButton = $("saveButton");
-  const cancelEdit = $("cancelEdit");
-
-  // ===== STATE =====
-  let db = null;
-  let ads = [];
-  let selectedRect = null;
-  let editingId = null;
-  let currentImageData = null;
-  let dragState = null; // { pointerId, startX, startY, moved }
-
-  // ===== UTIL =====
-  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-
-  function setStatus(msg, type = "") {
+  "use strict";
+(function () {
+  var BOARD_W = 10000;
+  var BOARD_H = 5625;
+  var MIN_SIZE = 50;
+  var MAX_FILE = 5 * 1024 * 1024;
+  var MAX_IMG_DIM = 900;
+  var JPEG_QUALITY = 0.82;
+  var STORAGE_KEY = "pixelmarket_v6_ads";
+  var $ = function (id) { return document.getElementById(id); };
+  var board = $("board");
+  var selectionEl = $("selection");
+  var statusEl = $("status");
+  var selectionInfo = $("selectionInfo");
+  var formSelectionInfo = $("formSelectionInfo");
+  var form = $("adForm");
+  var imageInput = $("adImage");
+  var preview = $("preview");
+  var fileWrap = $("fileWrap");
+  var fileName = $("fileName");
+  var adList = $("adList");
+  var formTitle = $("formTitle");
+  var saveButton = $("saveButton");
+  var cancelEdit = $("cancelEdit");
+  var ads = [];
+  var selectedRect = null;
+  var editingId = null;
+  var currentImage = null;
+  var drag = null;
+  function clamp(v, min, max) {
+    if (v < min) return min;
+    if (v > max) return max;
+    return v;
+  }
+  function setStatus(msg, type) {
     statusEl.textContent = msg;
     statusEl.className = "status" + (type ? " " + type : "");
   }
-
   function boardPoint(ev) {
-    const r = board.getBoundingClientRect();
+    var r = board.getBoundingClientRect();
     return {
       x: clamp((ev.clientX - r.left) / r.width * BOARD_W, 0, BOARD_W),
       y: clamp((ev.clientY - r.top) / r.height * BOARD_H, 0, BOARD_H)
     };
   }
-
   function rectBetween(a, b) {
-    const x = Math.min(a.x, b.x);
-    const y = Math.min(a.y, b.y);
-    const right = Math.max(a.x, b.x);
-    const bottom = Math.max(a.y, b.y);
-    return { x: Math.round(x), y: Math.round(y), w: Math.round(right - x), h: Math.round(bottom - y) };
+    var x = Math.min(a.x, b.x);
+    var y = Math.min(a.y, b.y);
+    var r = Math.max(a.x, b.x);
+    var b2 = Math.max(a.y, b.y);
+    return {
+      x: Math.round(x),
+      y: Math.round(y),
+      w: Math.round(r - x),
+      h: Math.round(b2 - y)
+    };
   }
-
   function clampRect(r) {
-    const w = Math.round(clamp(r.w, 0, BOARD_W));
-    const h = Math.round(clamp(r.h, 0, BOARD_H));
-    const x = Math.round(clamp(r.x, 0, BOARD_W - w));
-    const y = Math.round(clamp(r.y, 0, BOARD_H - h));
-    return { x, y, w, h };
+    var w = Math.round(clamp(r.w, 0, BOARD_W));
+    var h = Math.round(clamp(r.h, 0, BOARD_H));
+    var x = Math.round(clamp(r.x, 0, BOARD_W - w));
+    var y = Math.round(clamp(r.y, 0, BOARD_H - h));
+    return { x: x, y: y, w: w, h: h };
   }
-
   function showSelection(rect) {
-    if (!rect) { selectionEl.style.display = "none"; return; }
+    if (!rect) {
+      selectionEl.style.display = "none";
+      return;
+    }
     selectionEl.style.display = "block";
     selectionEl.style.left = (rect.x / BOARD_W * 100) + "%";
     selectionEl.style.top = (rect.y / BOARD_H * 100) + "%";
     selectionEl.style.width = (rect.w / BOARD_W * 100) + "%";
     selectionEl.style.height = (rect.h / BOARD_H * 100) + "%";
   }
-
-  function updateSelectionInfo(rect, msg = "") {
-    if (!rect) {
+  function updateSelectionInfo(rect, msg) {
+    if (!rect || rect.w <= 0 || rect.h <= 0) {
       selectionInfo.textContent = msg || "Area belum dipilih.";
       formSelectionInfo.textContent = "Belum ada area.";
       return;
     }
-    const text = `${rect.w} × ${rect.h} pixel`;
-    selectionInfo.textContent = msg ? `${msg} — ${text}` : text;
+    var text = rect.w + " × " + rect.h + " pixel";
+    selectionInfo.textContent = msg ? (msg + " — " + text) : text;
     formSelectionInfo.textContent = text;
   }
-
-  function resetSelection(msg = "Seleksi dibatalkan.") {
+  function resetSelection(msg) {
     selectedRect = null;
     showSelection(null);
-    updateSelectionInfo(null, msg);
+    updateSelectionInfo(null, msg || "Area belum dipilih.");
   }
-
-  function isValidHttpUrl(v) {
-    try { const u = new URL(v); return u.protocol === "http:" || u.protocol === "https:"; }
-    catch { return false; }
+  function isHttpUrl(v) {
+    try {
+      var u = new URL(v);
+      return u.protocol === "http:" || u.protocol === "https:";
+    } catch (e) { return false; }
   }
-
-  // ===== INDEXEDDB =====
-  function openDB() {
-    return new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, DB_VERSION);
-      req.onupgradeneeded = () => {
-        const d = req.result;
-        if (!d.objectStoreNames.contains("ads")) d.createObjectStore("ads", { keyPath: "id" });
-      };
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error || new Error("Gagal buka database."));
-    });
+  function makePlaceholder(text) {
+    var safe = String(text).replace(/[<>&"']/g, "");
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="225">'
+      + '<rect width="100%" height="100%" fill="#8b7cff"/>'
+      + '<text x="50%" y="50%" fill="white" font-size="24" '
+      + 'text-anchor="middle" dominant-baseline="middle" '
+      + 'font-family="sans-serif">' + safe + '</text></svg>';
+    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
   }
-
-  function dbOp(mode, action) {
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction("ads", mode);
-      const store = tx.objectStore("ads");
-      let req;
-      try { req = action(store); }
-      catch (e) { reject(e); return; }
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error || new Error("Operasi DB gagal."));
-      tx.onabort = () => reject(tx.error || new Error("Transaksi DB dibatalkan."));
-    });
+  function saveAds() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(ads));
+      return true;
+    } catch (e) {
+      setStatus("Gagal menyimpan (storage penuh?).", "error");
+      return false;
+    }
   }
-
-  async function loadAds() {
-    ads = await dbOp("readonly", s => s.getAll());
-    renderBoard();
-    renderList();
+  function loadAdsFromStorage() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) { ads = []; return; }
+      var parsed = JSON.parse(raw);
+      ads = Array.isArray(parsed) ? parsed : [];
+    } catch (e) { ads = []; }
   }
-
-  // ===== RENDER =====
   function renderBoard() {
-    board.querySelectorAll(".ad-box").forEach(el => el.remove());
-    for (const ad of ads) {
+    var boxes = board.querySelectorAll(".ad-box");
+    for (var i = 0; i < boxes.length; i++) boxes[i].remove();
+    for (var j = 0; j < ads.length; j++) {
+      var ad = ads[j];
       if (ad.status !== "active") continue;
-      const r = clampRect(ad.rect);
+      var r = clampRect(ad.rect);
       if (r.w <= 0 || r.h <= 0) continue;
-
-      const box = document.createElement("div");
+      var box = document.createElement("div");
       box.className = "ad-box";
       box.style.left = (r.x / BOARD_W * 100) + "%";
       box.style.top = (r.y / BOARD_H * 100) + "%";
       box.style.width = (r.w / BOARD_W * 100) + "%";
       box.style.height = (r.h / BOARD_H * 100) + "%";
-
-      const link = document.createElement("a");
+      var link = document.createElement("a");
       link.href = ad.url;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
-
-      const img = document.createElement("img");
+      var img = document.createElement("img");
       img.src = ad.image;
       img.alt = ad.name;
       img.draggable = false;
-
-      const title = document.createElement("span");
+      var title = document.createElement("span");
       title.className = "ad-title";
       title.textContent = ad.name;
-
-      link.append(img, title);
-      box.append(link);
+      link.appendChild(img);
+      link.appendChild(title);
+      box.appendChild(link);
       board.insertBefore(box, selectionEl);
     }
   }
-
-  function actionBtn(text, cls, fn) {
-    const b = document.createElement("button");
+  function makeButton(text, cls, handler) {
+    var b = document.createElement("button");
     b.type = "button";
     b.textContent = text;
     if (cls) b.className = cls;
-    b.addEventListener("click", fn);
+    b.addEventListener("click", handler);
     return b;
   }
-
   function renderList() {
     adList.replaceChildren();
-    if (!ads.length) {
-      const p = document.createElement("p");
-      p.className = "empty";
-      p.textContent = "Belum ada iklan. Buat iklan pertamamu!";
-      adList.append(p);
+    if (ads.length === 0) {
+      var empty = document.createElement("p");
+      empty.className = "empty";
+      empty.textContent = "Belum ada iklan. Buat iklan pertamamu!";
+      adList.appendChild(empty);
       return;
     }
-    for (const ad of ads) {
-      const item = document.createElement("article");
-      item.className = "ad-item";
-
-      const pill = document.createElement("span");
-      pill.className = "pill " + (ad.status === "active" ? "active" : "inactive");
-      pill.textContent = ad.status === "active" ? "Aktif" : "Nonaktif";
-
-      const title = document.createElement("h3");
-      title.textContent = ad.name;
-
-      const img = document.createElement("img");
-      img.src = ad.image;
-      img.alt = ad.name;
-      img.loading = "lazy";
-
-      const desc = document.createElement("p");
-      desc.textContent = ad.description || "Tidak ada deskripsi.";
-
-      const url = document.createElement("a");
-      url.href = ad.url;
-      url.target = "_blank";
-      url.rel = "noopener noreferrer";
-      url.textContent = ad.url;
-
-      const dims = document.createElement("p");
-      dims.textContent = `Area: ${ad.rect.w} × ${ad.rect.h} pixel`;
-
-      const actions = document.createElement("div");
-      actions.className = "row";
-      actions.append(
-        actionBtn("Edit", "secondary", () => startEdit(ad.id)),
-        actionBtn(ad.status === "active" ? "Nonaktifkan" : "Aktifkan", "secondary", () => toggleStatus(ad.id)),
-        actionBtn("Hapus", "danger", () => deleteAd(ad.id))
-      );
-
-      item.append(pill, title, img, desc, url, dims, actions);
-      adList.append(item);
+    for (var i = 0; i < ads.length; i++) {
+      (function (ad) {
+        var item = document.createElement("article");
+        item.className = "ad-item";
+        var pill = document.createElement("span");
+        pill.className = "pill " + (ad.status === "active" ? "active" : "inactive");
+        pill.textContent = ad.status === "active" ? "Aktif" : "Nonaktif";
+        var title = document.createElement("h3");
+        title.textContent = ad.name;
+        var img = document.createElement("img");
+        img.src = ad.image;
+        img.alt = "Gambar " + ad.name;
+        img.loading = "lazy";
+        var desc = document.createElement("p");
+        desc.textContent = ad.description || "Tidak ada deskripsi.";
+        var link = document.createElement("a");
+        link.href = ad.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = ad.url;
+        var dims = document.createElement("p");
+        dims.textContent = "Area: " + ad.rect.w + " × " + ad.rect.h + " pixel";
+        var actions = document.createElement("div");
+        actions.className = "row";
+        actions.appendChild(makeButton("Edit", "secondary", function () { startEdit(ad.id); }));
+        actions.appendChild(makeButton(
+          ad.status === "active" ? "Nonaktifkan" : "Aktifkan",
+          "secondary",
+          function () { toggleStatus(ad.id); }
+        ));
+        actions.appendChild(makeButton("Hapus", "danger", function () { deleteAd(ad.id); }));
+        item.appendChild(pill);
+        item.appendChild(title);
+        item.appendChild(img);
+        item.appendChild(desc);
+        item.appendChild(link);
+        item.appendChild(dims);
+        item.appendChild(actions);
+        adList.appendChild(item);
+      })(ads[i]);
     }
   }
-
-  // ===== DRAG (VERSI BERSIH) =====
-  // Prinsip: pakai pointer events + setPointerCapture.
-  // Jangan preventDefault di pointerdown (bisa memicu pointercancel di Safari).
-  // Jangan pakai lostpointercapture untuk reset drag.
-
-  board.addEventListener("pointerdown", ev => {
+  function renderAll() {
+    renderBoard();
+    renderList();
+  }
+  function onPointerDown(ev) {
     if (ev.pointerType === "mouse" && ev.button !== 0) return;
-    if (dragState) return;
-    // Klik pada iklan → biarkan link bekerja
-    if (ev.target instanceof Element && ev.target.closest(".ad-box a")) return;
-
-    const p = boardPoint(ev);
-    dragState = { pointerId: ev.pointerId, startX: p.x, startY: p.y, moved: false };
+    if (drag) return;
+    if (ev.target && ev.target.closest && ev.target.closest(".ad-box")) return;
+    var p = boardPoint(ev);
+    drag = { id: ev.pointerId, sx: p.x, sy: p.y };
+    try { board.setPointerCapture(ev.pointerId); } catch (e) {}
     selectedRect = { x: Math.round(p.x), y: Math.round(p.y), w: 0, h: 0 };
-
-    board.classList.add("dragging");
-    try { board.setPointerCapture(ev.pointerId); } catch (_) {}
-
     showSelection(selectedRect);
-    updateSelectionInfo(selectedRect, "Tarik untuk memilih area");
-    setStatus("Tarik untuk membuat kotak iklan.", "ok");
-  });
-
-  board.addEventListener("pointermove", ev => {
-    if (!dragState || ev.pointerId !== dragState.pointerId) return;
-    const p = boardPoint(ev);
-    const dx = p.x - dragState.startX;
-    const dy = p.y - dragState.startY;
-    if (Math.abs(dx) + Math.abs(dy) >= 6) dragState.moved = true;
-
-    selectedRect = rectBetween(
-      { x: dragState.startX, y: dragState.startY },
-      p
-    );
+    updateSelectionInfo(selectedRect, "Tarik untuk memperbesar");
+    setStatus("Tarik jari untuk membuat kotak seleksi…");
+  }
+  function onPointerMove(ev) {
+    if (!drag || ev.pointerId !== drag.id) return;
+    var p = boardPoint(ev);
+    selectedRect = rectBetween({ x: drag.sx, y: drag.sy }, p);
     showSelection(selectedRect);
-    updateSelectionInfo(selectedRect, dragState.moved ? "Sedang menarik" : "Gerakkan lebih jauh");
-  });
-
-  function endDrag(ev, cancelled) {
-    if (!dragState || ev.pointerId !== dragState.pointerId) return;
-    const state = dragState;
-    dragState = null;
-    board.classList.remove("dragging");
-
-    try { if (board.hasPointerCapture(state.pointerId)) board.releasePointerCapture(state.pointerId); } catch (_) {}
-
-    if (cancelled) { resetSelection("Gerakan dibatalkan."); return; }
-
-    const p = boardPoint(ev);
-    const rect = rectBetween({ x: state.startX, y: state.startY }, p);
-
-    if (!state.moved) {
-      resetSelection("Sentuhan terdeteksi. Tarik lebih jauh.");
-      return;
-    }
+    updateSelectionInfo(selectedRect, "Sedang menarik");
+  }
+  function onPointerUp(ev) {
+    if (!drag || ev.pointerId !== drag.id) return;
+    var p = boardPoint(ev);
+    var rect = rectBetween({ x: drag.sx, y: drag.sy }, p);
+    drag = null;
+    try {
+      if (board.hasPointerCapture(ev.pointerId)) {
+        board.releasePointerCapture(ev.pointerId);
+      }
+    } catch (e) {}
     if (rect.w < MIN_SIZE || rect.h < MIN_SIZE) {
-      resetSelection("Kotak terlalu kecil. Tarik lebih besar.");
-      setStatus("Area terlalu kecil.", "error");
+      resetSelection("Kotak terlalu kecil (min " + MIN_SIZE + "px). Coba lagi.");
+      setStatus("Area terlalu kecil. Tarik lebih lebar.", "error");
       return;
     }
     selectedRect = clampRect(rect);
     showSelection(selectedRect);
     updateSelectionInfo(selectedRect, "Area terpilih");
-    setStatus("Area terpilih. Isi formulir iklan.", "ok");
-  }
-
-  board.addEventListener("pointerup", ev => endDrag(ev, false));
-  board.addEventListener("pointercancel", ev => endDrag(ev, true));
-
-  // Batalkan seleksi
-  $("clearSelection").addEventListener("click", () => {
-    if (dragState) {
-      try { board.releasePointerCapture(dragState.pointerId); } catch (_) {}
-      dragState = null;
+    setStatus("✓ Area terpilih (" + selectedRect.w + "×" + selectedRect.h + "). Isi formulir lalu simpan.", "ok");
+    var nameInput = $("adName");
+    if (nameInput && !editingId) {
+      setTimeout(function () { nameInput.focus(); }, 100);
     }
-    board.classList.remove("dragging");
-    resetSelection();
+  }
+  function onPointerCancel(ev) {
+    if (!drag || ev.pointerId !== drag.id) return;
+    drag = null;
+    resetSelection("Sentuhan dibatalkan.");
+    setStatus("Sentuhan terputus. Coba lagi.", "error");
+  }
+  board.addEventListener("pointerdown", onPointerDown);
+  board.addEventListener("pointermove", onPointerMove);
+  board.addEventListener("pointerup", onPointerUp);
+  board.addEventListener("pointercancel", onPointerCancel);
+  $("clearSelection").addEventListener("click", function () {
+    if (drag) {
+      try { board.releasePointerCapture(drag.id); } catch (e) {}
+      drag = null;
+    }
+    resetSelection("Seleksi dibatalkan.");
     setStatus("Seleksi dibatalkan.");
   });
-
-  // Refresh
-  $("refresh").addEventListener("click", async () => {
-    try {
-      await loadAds();
-      setStatus("Daftar iklan dimuat ulang.", "ok");
-    } catch (e) {
-      setStatus("Gagal memuat: " + e.message, "error");
+  $("refresh").addEventListener("click", function () {
+    loadAdsFromStorage();
+    renderAll();
+    setStatus("Daftar iklan dimuat ulang.", "ok");
+  });
+  imageInput.addEventListener("change", function () {
+    var file = imageInput.files && imageInput.files[0];
+    if (!file) {
+      fileName.textContent = "Belum ada gambar";
+      fileWrap.classList.remove("has-file");
+      preview.style.display = "none";
+      preview.removeAttribute("src");
+      return;
     }
-  });
-
-  // ===== FORM =====
-  imageInput.addEventListener("change", () => {
-    const file = imageInput.files && imageInput.files[0];
-    if (!file) { preview.style.display = "none"; currentImageData = editingId ? currentImageData : null; return; }
-    if (!file.type.startsWith("image/")) { setStatus("File harus gambar.", "error"); imageInput.value = ""; return; }
-    if (file.size > MAX_IMAGE) { setStatus("Gambar terlalu besar (maks 5MB).", "error"); imageInput.value = ""; return; }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      currentImageData = reader.result;
-      preview.src = reader.result;
+    if (!file.type || file.type.indexOf("image/") !== 0) {
+      setStatus("File harus berupa gambar.", "error");
+      imageInput.value = "";
+      return;
+    }
+    if (file.size > MAX_FILE) {
+      setStatus("Gambar terlalu besar (maks 5 MB).", "error");
+      imageInput.value = "";
+      return;
+    }
+    fileName.textContent = file.name;
+    fileWrap.classList.add("has-file");
+    processImage(file).then(function (dataUrl) {
+      currentImage = dataUrl;
+      preview.src = dataUrl;
       preview.style.display = "block";
-    };
-    reader.onerror = () => setStatus("Gagal membaca gambar.", "error");
-    reader.readAsDataURL(file);
+    }).catch(function (err) {
+      setStatus("Gagal memproses gambar: " + err.message, "error");
+    });
   });
-
+  function processImage(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        var img = new Image();
+        img.onload = function () {
+          var w = img.naturalWidth || img.width;
+          var h = img.naturalHeight || img.height;
+          if (w > MAX_IMG_DIM || h > MAX_IMG_DIM) {
+            if (w > h) {
+              h = Math.round(h * MAX_IMG_DIM / w);
+              w = MAX_IMG_DIM;
+            } else {
+              w = Math.round(w * MAX_IMG_DIM / h);
+              h = MAX_IMG_DIM;
+            }
+          }
+          var canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          var ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+          try {
+            resolve(canvas.toDataURL("image/jpeg", JPEG_QUALITY));
+          } catch (e) {
+            reject(new Error("Gagal kompres gambar"));
+          }
+        };
+        img.onerror = function () { reject(new Error("Gambar rusak")); };
+        img.src = reader.result;
+      };
+      reader.onerror = function () { reject(new Error("Gagal baca file")); };
+      reader.readAsDataURL(file);
+    });
+  }
   function resetForm() {
     form.reset();
     editingId = null;
-    currentImageData = null;
+    currentImage = null;
     preview.style.display = "none";
-    preview.src = "";
+    preview.removeAttribute("src");
+    fileName.textContent = "Belum ada gambar";
+    fileWrap.classList.remove("has-file");
     formTitle.textContent = "➕ Buat Iklan";
     saveButton.textContent = "Simpan Iklan";
     cancelEdit.hidden = true;
   }
-
-  cancelEdit.addEventListener("click", () => {
+  cancelEdit.addEventListener("click", function () {
     resetForm();
-    resetSelection("Edit dibatalkan.");
+    resetSelection("Area belum dipilih.");
     setStatus("Edit dibatalkan.");
   });
-
-  form.addEventListener("submit", async ev => {
+  form.addEventListener("submit", function (ev) {
     ev.preventDefault();
-
-    const name = $("adName").value.trim();
-    const url = $("adUrl").value.trim();
-    const description = $("adDescription").value.trim();
-    const status = $("adStatus").value;
-    const file = imageInput.files && imageInput.files[0];
-
-    if (!name) { setStatus("Nama iklan wajib diisi.", "error"); return; }
-    if (!isValidHttpUrl(url)) { setStatus("URL tidak valid. Gunakan http/https.", "error"); return; }
-
-    // Gambar: pakai file baru kalau ada, atau currentImageData (edit), atau fallback kotak warna
-    let imageData = currentImageData;
-    if (file) {
-      imageData = await new Promise((res, rej) => {
-        const r = new FileReader();
-        r.onload = () => res(r.result);
-        r.onerror = () => rej(new Error("Gagal baca gambar."));
-        r.readAsDataURL(file);
-      });
+    var name = $("adName").value.trim();
+    var url = $("adUrl").value.trim();
+    var description = $("adDescription").value.trim();
+    var status = $("adStatus").value;
+    if (!name) {
+      setStatus("Nama iklan wajib diisi.", "error");
+      return;
     }
-    if (!imageD
+    if (!isHttpUrl(url)) {
+      setStatus("URL tidak valid. Harus diawali http:// atau https://", "error");
+      return;
+    }
+    var image = currentImage;
+    if (!image && editingId) {
+      var existing = null;
+      for (var i = 0; i < ads.length; i++) {
+        if (ads[i].id === editingId) { existing = ads[i]; break; }
+      }
+      if (existing) image = existing.image;
+    }
+    if (!image) {
+      image = makePlaceholder(name);
+    }
+    if (editingId) {
+      var found = null;
+      for (var k = 0; k < ads.length; k++) {
+        if (ads[k].id === editingId) { found = ads[k]; break; }
+      }
+      if (!found) {
+        setStatus("Iklan tidak ditemukan.", "error");
+        return;
+      }
+      found.name = name;
+      found.url = url;
+      found.description = description;
+      found.status = status;
+      found.image = image;
+      if (!saveAds()) return;
+      setStatus("✓ Iklan diperbarui.", "ok");
+    } else {
+      if (!selectedRect || selectedRect.w < MIN_SIZE || selectedRect.h < MIN_SIZE) {
+        setStatus("Pilih area di papan dulu (min " + MIN_SIZE + "px).", "error");
+        return;
+      }
+      var newAd = {
+        id: "ad_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8),
+        name: name,
+        url: url,
+        description: description,
+        status: status,
+        image: image,
+        rect: { x: selectedRect.x, y: selectedRect.y, w: selectedRect.w, h: selectedRect.h },
+        createdAt: Date.now()
+      };
+      ads.push(newAd);
+      if (!saveAds()) {
+        ads.pop();
+        return;
+      }
+      setStatus("✓ Iklan baru disimpan.", "ok");
+    }
+    resetForm();
+    resetSelection("Area belum dipilih.");
+    renderAll();
+  });
+  function findAd(id) {
+    for (var i = 0; i < ads.length; i++) {
+      if (ads[i].id === id) return ads[i];
+    }
+    return null;
+  }
+  function startEdit(id) {
+    var ad = findAd(id);
+    if (!ad) return;
+    editingId = id;
+    $("adName").value = ad.name;
+    $("adUrl").value = ad.url;
+    $("adDescription").value = ad.description || "";
+    $("adStatus").value = ad.status;
+    currentImage = ad.image;
+    preview.src = ad.image;
+    preview.style.display = "block";
+    fileName.textContent = "Gambar saat ini";
+    fileWrap.classList.add("has-file");
+    formTitle.textContent = "✏️ Edit Iklan";
+    saveButton.textContent = "Simpan Perubahan";
+    cancelEdit.hidden = false;
+    selectedRect = ad.rect;
+    showSelection(selectedRect);
+    updateSelectionInfo(selectedRect, "Area iklan ini");
+    setStatus("Mode edit: ubah data lalu simpan.", "ok");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function toggleStatus(id) {
+    var ad = findAd(id);
+    if (!ad) return;
+    ad.status = (ad.status === "active") ? "inactive" : "active";
+    if (!saveAds()) return;
+    renderAll();
+    setStatus("Status diubah menjadi " + ad.status + ".", "ok");
+  }
+  function deleteAd(id) {
+    var ad = findAd(id);
+    if (!ad) return;
+    if (!window.confirm('Hapus iklan "' + ad.name + '"?')) return;
+    for (var i = 0; i < ads.length; i++) {
+      if (ads[i].id === id) { ads.splice(i, 1); break; }
+    }
+    if (editingId === id) resetForm();
+    if (!saveAds()) return;
+    renderAll();
+    setStatus("Iklan dihapus.", "ok");
+  }
+  loadAdsFromStorage();
+  renderAll();
+  setStatus("✓ Siap. Tarik kotak di papan untuk mulai.", "ok");
+})();
+</script>
+</body>
+</html>
